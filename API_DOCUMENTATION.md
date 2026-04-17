@@ -2,17 +2,22 @@
 
 This document provides details on the available API endpoints, their expected payloads, and testing examples using `curl`.
 
-## Base URL
-All API requests should be prefixed with: `http://localhost:8080/api`
+## Base URL & Multi-Tenancy
+All API requests must be prefixed with the `tenantName` (the specific university or college you are interacting with):
+`http://localhost:8080/api/{tenantName}`
+
+*(Example: `http://localhost:8080/api/harvard`)*
+
+When an API request is made to a new tenant for the very first time, the system will automatically provision a new, isolated database schema for that tenant.
 
 ---
 
 ## 1. Authentication Endpoints
 
 ### 1.1 Signup
-Registers a new user in the system. The password is securely hashed using BCrypt before storing.
+Registers a new user in the tenant's specific database schema. The password is securely hashed using BCrypt before storing.
 
-- **URL:** `/auth/signup`
+- **URL:** `/{tenantName}/auth/signup`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
 
@@ -34,7 +39,7 @@ User registered successfully!
 
 #### `curl` Example
 ```bash
-curl -X POST http://localhost:8080/api/auth/signup \
+curl -X POST http://localhost:8080/api/harvard/auth/signup \
   -H "Content-Type: application/json" \
   -d "{\"name\": \"John Doe\", \"email\": \"johndoe@example.com\", \"password\": \"securepassword123\", \"role\": \"professor\"}"
 ```
@@ -42,9 +47,9 @@ curl -X POST http://localhost:8080/api/auth/signup \
 ---
 
 ### 1.2 Login
-Authenticates a user and returns a JSON Web Token (JWT) that must be used for subsequent authenticated requests.
+Authenticates a user from the specified tenant's database and returns a JSON Web Token (JWT) that must be used for subsequent authenticated requests.
 
-- **URL:** `/auth/login`
+- **URL:** `/{tenantName}/auth/login`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
 
@@ -67,7 +72,7 @@ Authenticates a user and returns a JSON Web Token (JWT) that must be used for su
 
 #### `curl` Example
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8080/api/harvard/auth/login \
   -H "Content-Type: application/json" \
   -d "{\"email\": \"johndoe@example.com\", \"password\": \"securepassword123\"}"
 ```
@@ -77,7 +82,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 ### 1.3 Logout
 Logs out the user. Since JWTs are stateless, this endpoint clears the server-side SecurityContext. The client should also discard the token locally.
 
-- **URL:** `/auth/logout`
+- **URL:** `/{tenantName}/auth/logout`
 - **Method:** `POST`
 - **Authorization:** `Bearer <Your-JWT-Token>`
 
@@ -88,13 +93,14 @@ Logged out successfully.
 
 #### `curl` Example
 ```bash
-curl -X POST http://localhost:8080/api/auth/logout \
+curl -X POST http://localhost:8080/api/harvard/auth/logout \
   -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
 ```
 
 ---
 
 ## Testing Flow (Quick Start)
-1. **Create a User:** Run the Signup `curl` command.
-2. **Log In:** Run the Login `curl` command. Copy the `token` string from the JSON response.
+1. **Create a User:** Run the Signup `curl` command using a specific tenant (e.g., `harvard`). The system will automatically create a new database schema named `harvard` if it doesn't exist.
+2. **Log In:** Run the Login `curl` command for the same tenant. Copy the `token` string from the JSON response.
 3. **Make Authenticated Requests:** Add `-H "Authorization: Bearer <token>"` to any secured API endpoint you build in the future.
+4. **Test Data Isolation:** Try to log in with the same credentials but change the URL to a different tenant (e.g., `stanford`). It should fail because the databases are completely isolated!
