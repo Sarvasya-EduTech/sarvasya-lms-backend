@@ -74,4 +74,23 @@ public class ThemeSettings {
     
     @Column(name = "sidebar_text_color")
     private String sidebarTextColor;
+
+    // Widget Theme
+    @Column(name = "widget_card_background_color")
+    private String widgetCardBackgroundColor;
+
+    @Column(name = "widget_card_elevation")
+    private Double widgetCardElevation;
+
+    @Column(name = "widget_button_background_color")
+    private String widgetButtonBackgroundColor;
+
+    @Column(name = "widget_button_text_color")
+    private String widgetButtonTextColor;
+
+    @Column(name = "widget_input_background_color")
+    private String widgetInputBackgroundColor;
+
+    @Column(name = "widget_input_border_color")
+    private String widgetInputBorderColor;
 }

@@ -13,6 +13,7 @@ public class ThemeSettingsDto {
     private PrimaryThemeDto primary;
     private SecondaryThemeDto secondary;
     private SidebarThemeDto sidebar;
+    private WidgetThemeDto widgets;
     
     @Data
     @Builder
@@ -51,5 +52,18 @@ public class ThemeSettingsDto {
         private Integer gradientDir;
         private Boolean useGradient;
         private String textColor;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class WidgetThemeDto {
+        private String cardBackgroundColor;
+        private Double cardElevation;
+        private String buttonBackgroundColor;
+        private String buttonTextColor;
+        private String inputBackgroundColor;
+        private String inputBorderColor;
     }
 }

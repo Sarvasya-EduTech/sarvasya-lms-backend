@@ -26,7 +26,10 @@ public class ThemeSettingsService {
         List<ThemeSettings> settingsList = repository.findAll();
         ThemeSettings entity;
         if (settingsList.isEmpty()) {
+            // Start with defaults if no settings exist yet
+            ThemeSettingsDto defaults = getDefaultThemeSettings();
             entity = new ThemeSettings();
+            mapToEntity(defaults, entity);
         } else {
             entity = settingsList.get(0);
         }
@@ -62,6 +65,14 @@ public class ThemeSettingsService {
                         .useGradient(true)
                         .textColor("#FFFFFF")
                         .build())
+                .widgets(ThemeSettingsDto.WidgetThemeDto.builder()
+                        .cardBackgroundColor("#FFFFFF")
+                        .cardElevation(2.0)
+                        .buttonBackgroundColor("#009688")
+                        .buttonTextColor("#FFFFFF")
+                        .inputBackgroundColor("#FFFFFF")
+                        .inputBorderColor("#E0E0E0")
+                        .build())
                 .build();
     }
 
@@ -90,6 +101,14 @@ public class ThemeSettingsService {
                         .gradientDir(entity.getSidebarGradientDir())
                         .useGradient(entity.getSidebarUseGradient())
                         .textColor(entity.getSidebarTextColor())
+                        .build())
+                .widgets(ThemeSettingsDto.WidgetThemeDto.builder()
+                        .cardBackgroundColor(entity.getWidgetCardBackgroundColor())
+                        .cardElevation(entity.getWidgetCardElevation())
+                        .buttonBackgroundColor(entity.getWidgetButtonBackgroundColor())
+                        .buttonTextColor(entity.getWidgetButtonTextColor())
+                        .inputBackgroundColor(entity.getWidgetInputBackgroundColor())
+                        .inputBorderColor(entity.getWidgetInputBorderColor())
                         .build())
                 .build();
     }
@@ -120,6 +139,15 @@ public class ThemeSettingsService {
             entity.setSidebarGradientDir(dto.getSidebar().getGradientDir());
             entity.setSidebarUseGradient(dto.getSidebar().getUseGradient());
             entity.setSidebarTextColor(dto.getSidebar().getTextColor());
+        }
+
+        if (dto.getWidgets() != null) {
+            entity.setWidgetCardBackgroundColor(dto.getWidgets().getCardBackgroundColor());
+            entity.setWidgetCardElevation(dto.getWidgets().getCardElevation());
+            entity.setWidgetButtonBackgroundColor(dto.getWidgets().getButtonBackgroundColor());
+            entity.setWidgetButtonTextColor(dto.getWidgets().getButtonTextColor());
+            entity.setWidgetInputBackgroundColor(dto.getWidgets().getInputBackgroundColor());
+            entity.setWidgetInputBorderColor(dto.getWidgets().getInputBorderColor());
         }
     }
 }

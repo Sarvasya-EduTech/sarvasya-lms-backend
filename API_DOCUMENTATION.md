@@ -114,7 +114,7 @@ Theme configuration for the platform is stored per tenant.
 ### 2.1 Get Theme Settings
 Fetches the current theme configuration for the specific tenant. Unauthenticated users (e.g., the login page) can also access this to load tenant branding.
 
-- **URL:** `/v1/tenants/{tenantId}/theme`
+- **URL:** `/api/v1/tenants/{tenantId}/theme`
 - **Method:** `GET`
 
 #### Expected Response (200 OK)
@@ -143,6 +143,14 @@ Fetches the current theme configuration for the specific tenant. Unauthenticated
     "gradientDir": 1,
     "useGradient": true,
     "textColor": "#FFFFFF"
+  },
+  "widgets": {
+    "cardBackgroundColor": "#FFFFFF",
+    "cardElevation": 2.0,
+    "buttonBackgroundColor": "#009688",
+    "buttonTextColor": "#FFFFFF",
+    "inputBackgroundColor": "#FFFFFF",
+    "inputBorderColor": "#E0E0E0"
   }
 }
 ```
@@ -152,7 +160,7 @@ Fetches the current theme configuration for the specific tenant. Unauthenticated
 ### 2.2 Update Theme Settings
 Updates the theme configuration. Restricted to `admin` and `sarvasya-admin` roles.
 
-- **URL:** `/v1/tenants/{tenantId}/theme`
+- **URL:** `/api/v1/tenants/{tenantId}/theme`
 - **Method:** `PUT`
 - **Authorization:** `Bearer <Your-JWT-Token>`
 - **Content-Type:** `application/json`
@@ -162,3 +170,14 @@ Same as the `GET` response body.
 
 #### Expected Response (200 OK)
 Returns the updated theme settings in the same JSON format.
+
+#### Field Definitions
+| Section | Field | Type | Description |
+| :--- | :--- | :--- | :--- |
+| **primary** | seedColor | Hex String | Primary branding color (AppBar, Nav) |
+| **widgets** | cardBackgroundColor | Hex String | Default background for all Cards |
+| **widgets** | cardElevation | Double | Depth of shadows (0.0 to 12.0) |
+| **widgets** | buttonBackgroundColor | Hex String | Fill color for primary buttons |
+| **widgets** | buttonTextColor | Hex String | Text color for primary buttons |
+| **widgets** | inputBackgroundColor | Hex String | Background for text inputs |
+| **widgets** | inputBorderColor | Hex String | Border color for text inputs |

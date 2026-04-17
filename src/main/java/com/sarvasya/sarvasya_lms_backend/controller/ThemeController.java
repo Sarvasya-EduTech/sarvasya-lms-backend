@@ -21,9 +21,10 @@ public class ThemeController {
 
     @PutMapping
     @PreAuthorize("hasAuthority('admin') or hasAuthority('sarvasya-admin')")
-    public ResponseEntity<ThemeSettingsDto> updateThemeSettings(
+    public ResponseEntity<?> updateThemeSettings(
             @PathVariable String tenantId,
             @RequestBody ThemeSettingsDto themeSettingsDto) {
-        return ResponseEntity.ok(themeSettingsService.updateThemeSettings(themeSettingsDto));
+        themeSettingsService.updateThemeSettings(themeSettingsDto);
+        return ResponseEntity.ok(java.util.Map.of("message", "Theme updated successfully"));
     }
 }
