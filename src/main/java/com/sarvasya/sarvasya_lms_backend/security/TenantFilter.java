@@ -18,8 +18,15 @@ public class TenantFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
         
-        // Example path: /api/harvard/auth/login
-        if (path.startsWith("/api/")) {
+        // Example path: /api/harvard/auth/login or /api/v1/tenants/harvard/theme
+        if (path.startsWith("/api/v1/tenants/")) {
+            String[] parts = path.split("/");
+            // parts[0] = "", parts[1] = "api", parts[2] = "v1", parts[3] = "tenants", parts[4] = "{tenantName}"
+            if (parts.length >= 5) {
+                String tenantName = parts[4];
+                TenantContext.setTenantId(tenantName);
+            }
+        } else if (path.startsWith("/api/")) {
             String[] parts = path.split("/");
             // parts[0] = "", parts[1] = "api", parts[2] = "{tenantName}"
             if (parts.length >= 3) {
