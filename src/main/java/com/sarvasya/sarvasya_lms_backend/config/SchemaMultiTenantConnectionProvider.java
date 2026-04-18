@@ -61,11 +61,21 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
                     email varchar(255) NOT NULL UNIQUE,
                     name varchar(255) NOT NULL,
                     password varchar(255) NOT NULL,
-                    role varchar(255) NOT NULL
+                    role varchar(255) NOT NULL,
+                    is_verified boolean NOT NULL DEFAULT FALSE,
+                    is_active boolean NOT NULL DEFAULT FALSE,
+                    requires_password_change boolean NOT NULL DEFAULT TRUE,
+                    created_at timestamp
                 )
             """.formatted(tenantIdentifier);
             
             statement.execute(createUsersTable);
+            
+            // Ensure columns exist if table already existed
+            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_verified boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
+            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_active boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
+            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS requires_password_change boolean NOT NULL DEFAULT TRUE".formatted(tenantIdentifier));
+            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS created_at timestamp".formatted(tenantIdentifier));
 
             String createThemeSettingsTable = """
                 CREATE TABLE IF NOT EXISTS "%s".theme_settings (

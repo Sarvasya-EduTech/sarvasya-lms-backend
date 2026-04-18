@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class SignupRequest {
+public class UserCreateRequest {
     @NotBlank
     private String name;
 
@@ -14,9 +14,5 @@ public class SignupRequest {
     private String email;
 
     @NotBlank
-    private String password;
-
     private String role;
-
-    private boolean requiresPasswordChange;
 }

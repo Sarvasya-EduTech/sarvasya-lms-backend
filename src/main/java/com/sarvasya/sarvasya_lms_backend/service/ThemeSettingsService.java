@@ -6,8 +6,6 @@ import com.sarvasya.sarvasya_lms_backend.repository.ThemeSettingsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class ThemeSettingsService {
@@ -15,23 +13,20 @@ public class ThemeSettingsService {
     private final ThemeSettingsRepository repository;
 
     public ThemeSettingsDto getThemeSettings() {
-        List<ThemeSettings> settingsList = repository.findAll();
-        if (settingsList.isEmpty()) {
+        ThemeSettings entity = repository.findFirstByOrderByIdAsc();
+        if (entity == null) {
             return getDefaultThemeSettings();
         }
-        return mapToDto(settingsList.get(0));
+        return mapToDto(entity);
     }
 
     public ThemeSettingsDto updateThemeSettings(ThemeSettingsDto dto) {
-        List<ThemeSettings> settingsList = repository.findAll();
-        ThemeSettings entity;
-        if (settingsList.isEmpty()) {
+        ThemeSettings entity = repository.findFirstByOrderByIdAsc();
+        if (entity == null) {
             // Start with defaults if no settings exist yet
             ThemeSettingsDto defaults = getDefaultThemeSettings();
             entity = new ThemeSettings();
             mapToEntity(defaults, entity);
-        } else {
-            entity = settingsList.get(0);
         }
 
         mapToEntity(dto, entity);

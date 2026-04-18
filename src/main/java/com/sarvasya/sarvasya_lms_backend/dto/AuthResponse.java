@@ -9,6 +9,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthResponse {
     private String token;
-    private String email;
-    private String role;
+    private UserDto user;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserDto {
+        private java.util.UUID id;
+        private String email;
+        private String name;
+        private String role;
+        private boolean requiresPasswordChange;
+    }
 }
