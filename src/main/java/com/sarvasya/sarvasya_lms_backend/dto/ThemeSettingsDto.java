@@ -14,6 +14,8 @@ public class ThemeSettingsDto {
     private SecondaryThemeDto secondary;
     private SidebarThemeDto sidebar;
     private WidgetThemeDto widgets;
+    private String logoUrl;
+    private Long logoVersion;
     
     @Data
     @Builder

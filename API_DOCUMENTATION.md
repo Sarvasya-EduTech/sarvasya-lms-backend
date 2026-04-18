@@ -181,3 +181,108 @@ Returns the updated theme settings in the same JSON format.
 | **widgets** | buttonTextColor | Hex String | Text color for primary buttons |
 | **widgets** | inputBackgroundColor | Hex String | Background for text inputs |
 | **widgets** | inputBorderColor | Hex String | Border color for text inputs |
+
+---
+
+## 3. Bulk User Management & Forced Login Flow
+
+### 3.1 Initial Login & Forced Password Change
+When users (especially those created via bulk import) log in for the first time, their response will contain `"requiresPasswordChange": true` inside the nested user object.
+
+- **URL:** `/{tenantName}/auth/change-password`
+- **Method:** `POST`
+- **Authorization:** `Bearer <Your-JWT-Token>`
+
+#### Request Body
+```json
+{
+  "currentPassword": "USER_EMAIL", 
+  "newPassword": "SECURE_NEW_PASSWORD"
+}
+```
+*(Note: Bulk-created accounts have their `email` set as their initial temporary password.)*
+
+---
+
+### 3.2 Bulk Create Users
+Creates multiple users at once. Restricted to `sarvasya-admin` and `admin` roles. Automatically enforces tenant limits.
+
+- **URL:** `/api/{tenantName}/users/bulk`
+- **Method:** `POST`
+- **Authorization:** `Bearer <Your-JWT-Token>`
+
+#### Request Body (JSON Array)
+```json
+[
+  {
+    "name": "Student A",
+    "email": "studenta@example.com",
+    "role": "user"
+  },
+  {
+    "name": "Professor B",
+    "email": "profb@example.com",
+    "role": "professor"
+  }
+]
+```
+
+### 3.3 Get Bulk CSV Template
+Downloads a CSV template for bulk user imports.
+
+- **URL:** `/api/{tenantName}/users/bulk/template`
+- **Method:** `GET`
+- **Authorization:** `Bearer <Your-JWT-Token>`
+
+### 3.4 Bulk Delete Users
+Deletes multiple users by ID.
+
+- **URL:** `/api/{tenantName}/users/bulk`
+- **Method:** `DELETE`
+- **Authorization:** `Bearer <Your-JWT-Token>`
+
+#### Request Body
+```json
+{
+  "ids": ["UUID-1", "UUID-2"]
+}
+```
+
+---
+
+## 4. Tenant Specific Limits Configuration
+
+Each tenant has isolated row limits.
+
+### 4.1 Get Tenant Limits
+Fetches the active row limits configured for the current tenant.
+
+- **URL:** `/api/{tenantName}/limits`
+- **Method:** `GET`
+- **Authorization:** `Bearer <Your-JWT-Token>` (Requires `admin` or `sarvasya-admin`)
+
+#### Expected Response
+```json
+{
+  "id": 1,
+  "userLimit": 1000,
+  "professorLimit": 150,
+  "adminLimit": 10
+}
+```
+
+### 4.2 Update Tenant Limits
+Overrides the active limits for the tenant. Restricted specifically to the platform owner (`sarvasya-admin`).
+
+- **URL:** `/api/{tenantName}/limits`
+- **Method:** `PUT`
+- **Authorization:** `Bearer <Your-JWT-Token>` (Requires `sarvasya-admin`)
+
+#### Request Body
+```json
+{
+  "userLimit": 5000,
+  "professorLimit": 300,
+  "adminLimit": 20
+}
+```
