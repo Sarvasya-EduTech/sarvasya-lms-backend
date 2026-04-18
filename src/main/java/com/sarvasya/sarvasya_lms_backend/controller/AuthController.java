@@ -17,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +30,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final JavaMailSender mailSender;
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@PathVariable String tenantName, @Valid @RequestBody SignupRequest signupRequest) {
@@ -51,18 +54,20 @@ public class AuthController {
                 .role(userRole)
                 .isVerified(false)
                 .isActive(false)
+                .requiresPasswordChange(signupRequest.isRequiresPasswordChange())
                 .build();
 
         userRepository.save(user);
 
         if (userRole == Role.SARVASYA_ADMIN) {
             String token = jwtUtil.generateTokenForEmail(user.getEmail());
-            // TODO: Replace with actual JavaMailSender email implementation
+            String verificationLink = "http://localhost:8080/api/" + tenantName + "/auth/verify-email?token=" + token;
+            
+            sendVerificationEmail(user.getEmail(), verificationLink);
+            
             System.out.println("\n=====================================================");
-            System.out.println("VERIFICATION EMAIL ROUTED TO: sarvasya.edu.tech@gmail.com");
-            System.out.println("Please verify the new sarvasya-admin account (" + user.getEmail() + ").");
-            System.out.println("Verification Link:");
-            System.out.println("http://localhost:8080/api/" + tenantName + "/auth/verify-email?token=" + token);
+            System.out.println("VERIFICATION EMAIL SENT TO: sarvasya.edu.tech@gmail.com");
+            System.out.println("Verification Link: " + verificationLink);
             System.out.println("=====================================================\n");
         }
 
@@ -105,6 +110,7 @@ public class AuthController {
         AuthResponse.UserDto userDto = new AuthResponse.UserDto(
                 user.getId(),
                 user.getEmail(),
+                user.getName(),
                 user.getRole().getValue(),
                 user.isRequiresPasswordChange()
         );
@@ -143,5 +149,17 @@ public class AuthController {
         // For a more complete server-side logout, one could implement a token blacklist.
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok("Logged out successfully.");
+    }
+
+    private void sendVerificationEmail(String userEmail, String verificationLink) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("sarvasya.edu.tech@gmail.com");
+        message.setTo("sarvasya.edu.tech@gmail.com"); // Routing all sarvasya-admin verifications to central mail
+        message.setSubject("New Sarvasya Admin Verification Request");
+        message.setText("A new sarvasya-admin account has been created: " + userEmail + "\n\n" +
+                        "Please click the link below to verify and activate this account:\n" +
+                        verificationLink + "\n\n" +
+                        "If you did not expect this, please ignore this email.");
+        mailSender.send(message);
     }
 }

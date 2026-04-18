@@ -17,6 +17,7 @@ public class AuthResponse {
     public static class UserDto {
         private java.util.UUID id;
         private String email;
+        private String name;
         private String role;
         private boolean requiresPasswordChange;
     }
