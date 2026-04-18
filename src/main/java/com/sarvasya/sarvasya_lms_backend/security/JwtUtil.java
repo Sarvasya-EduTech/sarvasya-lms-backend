@@ -37,7 +37,7 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
     }
 
@@ -48,6 +48,11 @@ public class JwtUtil {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
+    }
+
+    public String generateTokenForEmail(String email) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, email);
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -61,12 +66,25 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final Claims claims = extractAllClaims(token);
+        return validateToken(claims, userDetails);
+    }
+
+    public Boolean validateToken(Claims claims, UserDetails userDetails) {
+        final String username = claims.getSubject();
+        final boolean isTokenExpired = claims.getExpiration().before(new Date());
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired);
+    }
+
+    private Key key;
+
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return key;
     }
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ThemeSettingsRepository extends JpaRepository<ThemeSettings, Long> {
+    ThemeSettings findFirstByOrderByIdAsc();
 }

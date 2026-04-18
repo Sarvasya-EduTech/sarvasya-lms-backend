@@ -2,6 +2,7 @@ package com.sarvasya.sarvasya_lms_backend.controller;
 
 import com.sarvasya.sarvasya_lms_backend.dto.AuthRequest;
 import com.sarvasya.sarvasya_lms_backend.dto.AuthResponse;
+import com.sarvasya.sarvasya_lms_backend.dto.ChangePasswordRequest;
 import com.sarvasya.sarvasya_lms_backend.dto.SignupRequest;
 import com.sarvasya.sarvasya_lms_backend.model.Role;
 import com.sarvasya.sarvasya_lms_backend.model.User;
@@ -9,7 +10,6 @@ import com.sarvasya.sarvasya_lms_backend.repository.UserRepository;
 import com.sarvasya.sarvasya_lms_backend.security.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/{tenantName}/auth")
@@ -31,7 +30,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<?> registerUser(@PathVariable String tenantName, @Valid @RequestBody SignupRequest signupRequest) {
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
@@ -50,11 +49,44 @@ public class AuthController {
                 .email(signupRequest.getEmail())
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .role(userRole)
+                .isVerified(false)
+                .isActive(false)
                 .build();
 
         userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully!");
+        if (userRole == Role.SARVASYA_ADMIN) {
+            String token = jwtUtil.generateTokenForEmail(user.getEmail());
+            // TODO: Replace with actual JavaMailSender email implementation
+            System.out.println("\n=====================================================");
+            System.out.println("VERIFICATION EMAIL ROUTED TO: sarvasya.edu.tech@gmail.com");
+            System.out.println("Please verify the new sarvasya-admin account (" + user.getEmail() + ").");
+            System.out.println("Verification Link:");
+            System.out.println("http://localhost:8080/api/" + tenantName + "/auth/verify-email?token=" + token);
+            System.out.println("=====================================================\n");
+        }
+
+        return ResponseEntity.ok("User registered successfully. Verification is pending.");
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@PathVariable String tenantName, @RequestParam String token) {
+        try {
+            String email = jwtUtil.extractUsername(token);
+            User user = userRepository.findByEmail(email).orElse(null);
+            
+            if (user == null) {
+                return ResponseEntity.badRequest().body("Error: User not found for this token.");
+            }
+            
+            user.setIsVerified(true);
+            user.setIsActive(true);
+            userRepository.save(user);
+            
+            return ResponseEntity.ok("Account verified and activated successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: Invalid or expired verification token.");
+        }
     }
 
     @PostMapping("/login")
@@ -70,7 +102,39 @@ public class AuthController {
         
         User user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow();
 
-        return ResponseEntity.ok(new AuthResponse(jwt, userDetails.getUsername(), user.getRole().getValue()));
+        AuthResponse.UserDto userDto = new AuthResponse.UserDto(
+                user.getId(),
+                user.getEmail(),
+                user.getRole().getValue(),
+                user.isRequiresPasswordChange()
+        );
+
+        return ResponseEntity.ok(new AuthResponse(jwt, userDto));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Error: Unauthorized");
+        }
+
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Error: User not found");
+        }
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("Error: Invalid current password");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setRequiresPasswordChange(false);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password changed successfully");
     }
 
     @PostMapping("/logout")
