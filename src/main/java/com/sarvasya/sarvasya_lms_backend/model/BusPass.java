@@ -10,15 +10,16 @@ import java.util.UUID;
 import com.github.f4b6a3.uuid.UuidCreator;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "bus_passes")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class User {
+public class BusPass {
 
     @Id
     @Column(updatable = false, nullable = false)
@@ -31,32 +32,33 @@ public class User {
         }
     }
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private User user;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bus_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Bus bus;
 
     @Column(nullable = false)
-    private String password;
+    private LocalDate validFrom;
+
+    @Column(nullable = false)
+    private LocalDate validTo;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
-
-    @Column(name = "is_verified", nullable = false)
     @Builder.Default
-    private Boolean isVerified = false;
-
-    @Column(name = "is_active", nullable = false)
-    @Builder.Default
-    private Boolean isActive = false;
-
-    @Column(name = "requires_password_change", nullable = false)
-    @Builder.Default
-    private boolean requiresPasswordChange = true;
+    private BusPassStatus status = BusPassStatus.ACTIVE;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    public enum BusPassStatus {
+        ACTIVE,
+        EXPIRED
+    }
 }

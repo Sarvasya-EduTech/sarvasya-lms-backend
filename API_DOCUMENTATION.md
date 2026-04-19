@@ -182,9 +182,207 @@ Creating a school administrator globally automatically triggers the creation of 
 }
 ```
 
+### 3.5 Tenant Impersonation
+Allows tenant-managers to impersonate a tenant and get an impersonation token to access tenant-specific resources.
+- **URL:** `/api/v1/tenants/{tenantId}/impersonate`
+- **Method:** `POST`
+- **Permissions:** `tenant-manager` only
+- **Response Example:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "impersonationToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tenantId": "harvard"
+}
+```
+
 ---
 
-## 4. Error Handling: Quota Exceeded
+## 4. Bus Management APIs (Tenant-Specific)
+These endpoints manage buses, bus schedules, and bus passes for transportation within a tenant.
+
+### 4.1 Bus Management
+#### Create Bus
+- **URL:** `/api/v1/buses`
+- **Method:** `POST`
+- **Permissions:** `ADMIN` only
+- **Payload Example:**
+```json
+{
+  "busNumber": "BUS-001",
+  "capacity": 50
+}
+```
+
+#### Get All Buses
+- **URL:** `/api/v1/buses`
+- **Method:** `GET`
+- **Permissions:** All authenticated users (`ADMIN`, `PROFESSOR`, `USER`)
+
+#### Get Bus by ID
+- **URL:** `/api/v1/buses/{id}`
+- **Method:** `GET`
+- **Permissions:** All authenticated users
+
+#### Update Bus
+- **URL:** `/api/v1/buses/{id}`
+- **Method:** `PUT`
+- **Permissions:** `ADMIN` only
+- **Payload Example:**
+```json
+{
+  "busNumber": "BUS-001",
+  "capacity": 60
+}
+```
+
+#### Delete Bus
+- **URL:** `/api/v1/buses/{id}`
+- **Method:** `DELETE`
+- **Permissions:** `ADMIN` only
+
+### 4.2 Bus Schedule Management
+#### Create Bus Schedule
+- **URL:** `/api/v1/bus-schedules`
+- **Method:** `POST`
+- **Permissions:** `ADMIN` only
+- **Payload Example:**
+```json
+{
+  "bus": { "id": "uuid-of-bus" },
+  "routeName": "Route A - Downtown",
+  "startTime": "08:00:00",
+  "endTime": "18:00:00"
+}
+```
+
+#### Response Example (DTO)
+```json
+{
+  "id": "uuid-of-schedule",
+  "bus": {
+    "id": "uuid-of-bus",
+    "busNumber": "BUS-001"
+  },
+  "routeName": "Route A - Downtown",
+  "startTime": "08:00:00",
+  "endTime": "18:00:00",
+  "createdAt": "2024-01-01T12:00:00"
+}
+```
+
+#### Get All Bus Schedules
+- **URL:** `/api/v1/bus-schedules`
+- **Method:** `GET`
+- **Permissions:** `ADMIN`, `PROFESSOR`, `USER`
+
+#### Get Bus Schedule by ID
+- **URL:** `/api/v1/bus-schedules/{id}`
+- **Method:** `GET`
+- **Permissions:** `ADMIN`, `PROFESSOR`, `USER`
+
+#### Get Bus Schedules by Bus ID
+- **URL:** `/api/v1/bus-schedules/bus/{busId}`
+- **Method:** `GET`
+- **Permissions:** `ADMIN`, `PROFESSOR`, `USER`
+
+#### Update Bus Schedule
+- **URL:** `/api/v1/bus-schedules/{id}`
+- **Method:** `PUT`
+- **Permissions:** `ADMIN` only
+- **Payload Example:**
+```json
+{
+  "bus": { "id": "uuid-of-bus" },
+  "routeName": "Route A - Downtown",
+  "startTime": "07:30:00",
+  "endTime": "18:30:00"
+}
+```
+
+#### Delete Bus Schedule
+- **URL:** `/api/v1/bus-schedules/{id}`
+- **Method:** `DELETE`
+- **Permissions:** `ADMIN` only
+
+### 4.3 Bus Pass Management
+#### Create Bus Pass
+- **URL:** `/api/v1/bus-passes`
+- **Method:** `POST`
+- **Permissions:** `ADMIN` only
+- **Payload Example:**
+```json
+{
+  "userName": "John Doe",
+  "busId": "uuid-of-bus",
+  "validFrom": "2024-01-01",
+  "validTo": "2024-12-31"
+}
+```
+
+#### Response Example (DTO)
+```json
+{
+  "id": "uuid-of-pass",
+  "user": {
+    "id": "uuid-of-user",
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "bus": {
+    "id": "uuid-of-bus",
+    "busNumber": "BUS-001"
+  },
+  "validFrom": "2024-01-01",
+  "validTo": "2024-12-31",
+  "status": "ACTIVE",
+  "createdAt": "2024-01-01T12:00:00"
+}
+```
+
+#### Get All Bus Passes
+- **URL:** `/api/v1/bus-passes`
+- **Method:** `GET`
+- **Permissions:** `ADMIN`, `PROFESSOR`, `USER`
+
+#### Get Bus Pass by ID
+- **URL:** `/api/v1/bus-passes/{id}`
+- **Method:** `GET`
+- **Permissions:** `ADMIN`, `PROFESSOR`, `USER`
+
+#### Get Bus Passes by User ID
+- **URL:** `/api/v1/bus-passes/user/{userId}`
+- **Method:** `GET`
+- **Permissions:** `ADMIN`, `PROFESSOR`, `USER`
+
+#### Get Bus Passes by Bus ID
+- **URL:** `/api/v1/bus-passes/bus/{busId}`
+- **Method:** `GET`
+- **Permissions:** `ADMIN`, `PROFESSOR`, `USER`
+
+#### Update Bus Pass
+- **URL:** `/api/v1/bus-passes/{id}`
+- **Method:** `PUT`
+- **Permissions:** `ADMIN` only
+- **Payload Example:**
+```json
+{
+  "user": { "id": "uuid-of-user" },
+  "bus": { "id": "uuid-of-bus" },
+  "validFrom": "2024-01-01",
+  "validTo": "2025-12-31",
+  "status": "EXPIRED"
+}
+```
+
+#### Delete Bus Pass
+- **URL:** `/api/v1/bus-passes/{id}`
+- **Method:** `DELETE`
+- **Permissions:** `ADMIN` only
+
+---
+
+## 5. Error Handling: Quota Exceeded
 The system enforces strict role-based quotas. Returns `400 Bad Request` when limits are hit.
 ```json
 {

@@ -58,6 +58,14 @@ public class JwtUtil {
         return createToken(claims, email);
     }
 
+    public String generateImpersonationToken(String userEmail, String tenantId, String originalRole) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tenantId", tenantId);
+        claims.put("originalRole", originalRole);
+        claims.put("impersonated", true);
+        return createToken(claims, userEmail);
+    }
+
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
