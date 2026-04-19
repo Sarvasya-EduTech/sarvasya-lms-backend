@@ -103,11 +103,17 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
                     widget_button_background_color VARCHAR(255),
                     widget_button_text_color VARCHAR(255),
                     widget_input_background_color VARCHAR(255),
-                    widget_input_border_color VARCHAR(255)
+                    widget_input_border_color VARCHAR(255),
+                    logo_url VARCHAR(255),
+                    logo_version BIGINT
                 )
             """.formatted(tenantIdentifier);
             
             statement.execute(createThemeSettingsTable);
+            
+            // Ensure new columns exist if table already existed
+            statement.execute("ALTER TABLE \"%s\".theme_settings ADD COLUMN IF NOT EXISTS logo_url VARCHAR(255)".formatted(tenantIdentifier));
+            statement.execute("ALTER TABLE \"%s\".theme_settings ADD COLUMN IF NOT EXISTS logo_version BIGINT".formatted(tenantIdentifier));
             
             initializedSchemas.add(tenantIdentifier);
         }

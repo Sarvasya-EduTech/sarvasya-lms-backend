@@ -22,6 +22,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
+        String authority = (user.getRole() != null) ? user.getRole().getValue() : "user";
+        System.out.println(">>> Loading user: " + user.getEmail() + " with authority: " + authority);
+
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
@@ -29,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 true, // accountNonExpired
                 true, // credentialsNonExpired
                 true, // accountNonLocked
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getValue()))
+                Collections.singletonList(new SimpleGrantedAuthority(authority))
         );
     }
 }

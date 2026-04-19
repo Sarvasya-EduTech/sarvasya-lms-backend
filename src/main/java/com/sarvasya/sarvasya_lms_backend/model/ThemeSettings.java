@@ -93,4 +93,10 @@ public class ThemeSettings {
 
     @Column(name = "widget_input_border_color")
     private String widgetInputBorderColor;
+
+    @Column(name = "logo_url")
+    private String logoUrl;
+
+    @Column(name = "logo_version")
+    private Long logoVersion;
 }

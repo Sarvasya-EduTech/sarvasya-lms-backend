@@ -5,9 +5,11 @@ import com.sarvasya.sarvasya_lms_backend.model.ThemeSettings;
 import com.sarvasya.sarvasya_lms_backend.repository.ThemeSettingsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ThemeSettingsService {
 
     private final ThemeSettingsRepository repository;
@@ -68,6 +70,8 @@ public class ThemeSettingsService {
                         .inputBackgroundColor("#FFFFFF")
                         .inputBorderColor("#E0E0E0")
                         .build())
+                .logoUrl(null)
+                .logoVersion(0L)
                 .build();
     }
 
@@ -105,6 +109,8 @@ public class ThemeSettingsService {
                         .inputBackgroundColor(entity.getWidgetInputBackgroundColor())
                         .inputBorderColor(entity.getWidgetInputBorderColor())
                         .build())
+                .logoUrl(entity.getLogoUrl())
+                .logoVersion(entity.getLogoVersion())
                 .build();
     }
 
@@ -143,6 +149,34 @@ public class ThemeSettingsService {
             entity.setWidgetButtonTextColor(dto.getWidgets().getButtonTextColor());
             entity.setWidgetInputBackgroundColor(dto.getWidgets().getInputBackgroundColor());
             entity.setWidgetInputBorderColor(dto.getWidgets().getInputBorderColor());
+        }
+
+        if (dto.getLogoUrl() != null) {
+            entity.setLogoUrl(dto.getLogoUrl());
+        }
+        if (dto.getLogoVersion() != null) {
+            entity.setLogoVersion(dto.getLogoVersion());
+        }
+    }
+
+    public void saveLogo(String logoUrl) {
+        ThemeSettings entity = repository.findFirstByOrderByIdAsc();
+        if (entity == null) {
+            entity = new ThemeSettings();
+            ThemeSettingsDto defaults = getDefaultThemeSettings();
+            mapToEntity(defaults, entity);
+        }
+        entity.setLogoUrl(logoUrl);
+        entity.setLogoVersion(System.currentTimeMillis()); // Update version to signal change
+        repository.save(entity);
+    }
+
+    public void deleteLogo() {
+        ThemeSettings entity = repository.findFirstByOrderByIdAsc();
+        if (entity != null) {
+            entity.setLogoUrl(null);
+            entity.setLogoVersion(System.currentTimeMillis());
+            repository.save(entity);
         }
     }
 }

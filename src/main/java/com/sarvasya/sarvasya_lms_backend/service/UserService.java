@@ -2,10 +2,12 @@ package com.sarvasya.sarvasya_lms_backend.service;
 
 import com.sarvasya.sarvasya_lms_backend.dto.UserCreateRequest;
 import com.sarvasya.sarvasya_lms_backend.model.Role;
+import com.sarvasya.sarvasya_lms_backend.model.TenantLimits;
 import com.sarvasya.sarvasya_lms_backend.model.User;
 import com.sarvasya.sarvasya_lms_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final TenantLimitsService tenantLimitsService;
+
+    private void checkRoleLimit(Role role, int additionalCount) {
+        long currentCount = userRepository.countByRole(role);
+        long newCount = currentCount + additionalCount;
+        
+        TenantLimits limits = tenantLimitsService.getLimits();
+
+        if (role == Role.USER && newCount > limits.getUserLimit()) {
+            throw new IllegalStateException("Role Creation Quota limit exceeded. Please purchase more quota limit for it.");
+        } else if (role == Role.PROFESSOR && newCount > limits.getProfessorLimit()) {
+            throw new IllegalStateException("Role Creation Quota limit exceeded. Please purchase more quota limit for it.");
+        } else if (role == Role.ADMIN && newCount > limits.getAdminLimit()) {
+            throw new IllegalStateException("Role Creation Quota limit exceeded. Please purchase more quota limit for it.");
+        }
+    }
 
     public void bulkCreateUsers(List<UserCreateRequest> requests, Role creatorRole) {
         List<User> usersToSave = new ArrayList<>();
@@ -44,6 +62,9 @@ public class UserService {
             if (userRepository.existsByEmail(req.getEmail())) {
                 continue; // Skip existing, or handle as update (create/update logic)
             }
+            // Check limits including currently pending saves
+            long pendingCount = usersToSave.stream().filter(u -> u.getRole() == targetRole).count();
+            checkRoleLimit(targetRole, (int) pendingCount + 1);
 
             String password = generateDefaultPassword(req.getName());
             User user = User.builder()
@@ -79,6 +100,8 @@ public class UserService {
         if (userRepository.existsByEmail(req.getEmail())) {
             throw new IllegalArgumentException("User with this email already exists");
         }
+
+        checkRoleLimit(targetRole, 1);
 
         String password = generateDefaultPassword(req.getName());
         User user = User.builder()
