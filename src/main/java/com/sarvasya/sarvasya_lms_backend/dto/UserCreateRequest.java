@@ -15,4 +15,6 @@ public class UserCreateRequest {
 
     @NotBlank
     private String role;
+
+    private String tenantId;
 }

@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/{tenantName}/users")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -34,9 +34,9 @@ public class UserController {
         return Role.fromValue(auth.getAuthorities().iterator().next().getAuthority());
     }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('professor') or hasAuthority('admin') or hasAuthority('sarvasya-admin')")
-    public ResponseEntity<?> createUser(@PathVariable String tenantName,
+    @PostMapping("/{tenantName}/users")
+    @PreAuthorize("hasAuthority('sarvasya-admin') or hasAuthority('admin') or hasAuthority('professor')")
+    public ResponseEntity<?> createUserLocal(@PathVariable String tenantName,
             @Valid @RequestBody UserCreateRequest request) {
         try {
             userService.createUser(request, getCurrentUserRole());
@@ -46,7 +46,27 @@ public class UserController {
         }
     }
 
-    @PostMapping("/bulk")
+    @PostMapping("/v1/users")
+    @PreAuthorize("hasAuthority('tenant-manager')")
+    public ResponseEntity<?> createUserGlobal(@Valid @RequestBody UserCreateRequest request) {
+        String targetTenantId = request.getTenantId();
+        if (targetTenantId == null || targetTenantId.isBlank()) {
+            return ResponseEntity.badRequest().body("Error: tenantId is required in the request body for global user creation.");
+        }
+
+        String originalTenant = com.sarvasya.sarvasya_lms_backend.security.TenantContext.getTenantId();
+        try {
+            com.sarvasya.sarvasya_lms_backend.security.TenantContext.setTenantId(targetTenantId);
+            userService.createUser(request, getCurrentUserRole());
+            return ResponseEntity.ok("User created successfully in tenant: " + targetTenantId);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } finally {
+            com.sarvasya.sarvasya_lms_backend.security.TenantContext.setTenantId(originalTenant);
+        }
+    }
+
+    @PostMapping("/{tenantName}/users/bulk")
     @PreAuthorize("hasAuthority('professor') or hasAuthority('admin') or hasAuthority('sarvasya-admin')")
     public ResponseEntity<?> bulkCreateUsers(@PathVariable String tenantName,
             @RequestParam("file") MultipartFile file) {
@@ -61,7 +81,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/bulk/json")
+    @PostMapping("/{tenantName}/users/bulk/json")
     @PreAuthorize("hasAuthority('professor') or hasAuthority('admin') or hasAuthority('sarvasya-admin')")
     public ResponseEntity<?> bulkCreateUsersJson(@PathVariable String tenantName,
             @Valid @RequestBody List<UserCreateRequest> requests) {
@@ -73,7 +93,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/bulk/template")
+    @GetMapping("/{tenantName}/users/bulk/template")
     public ResponseEntity<byte[]> getBulkTemplate(@PathVariable String tenantName) {
         String csvContent = userService.getBulkUploadTemplate(getCurrentUserRole());
         byte[] csvBytes = csvContent.getBytes(StandardCharsets.UTF_8);
@@ -84,12 +104,12 @@ public class UserController {
                 .body(csvBytes);
     }
 
-    @DeleteMapping("/bulk")
-    @PreAuthorize("hasAuthority('professor') or hasAuthority('admin') or hasAuthority('sarvasya-admin')")
+    @DeleteMapping("/{tenantName}/users/bulk")
+    @PreAuthorize("hasAuthority('tenant-manager') or hasAuthority('professor') or hasAuthority('admin') or hasAuthority('sarvasya-admin')")
     public ResponseEntity<?> bulkDeleteUsers(@PathVariable String tenantName,
             @Valid @RequestBody BulkUserDeleteRequest request) {
         try {
-            userService.bulkDeleteUsers(request.getIds());
+            userService.bulkDeleteUsers(request.getIds(), getCurrentUserRole());
             return ResponseEntity.ok("Users deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

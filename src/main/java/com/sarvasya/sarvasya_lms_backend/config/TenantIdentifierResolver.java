@@ -13,7 +13,7 @@ public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver
         if (tenantId != null && !tenantId.isBlank()) {
             return tenantId;
         }
-        return "public"; // default schema
+        return "tenant"; // default schema
     }
 
     @Override

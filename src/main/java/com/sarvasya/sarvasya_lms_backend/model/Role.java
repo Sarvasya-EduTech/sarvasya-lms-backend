@@ -7,7 +7,8 @@ public enum Role {
     SARVASYA_ADMIN("sarvasya-admin"),
     ADMIN("admin"),
     PROFESSOR("professor"),
-    USER("user");
+    USER("user"),
+    TENANT_MANAGER("tenant-manager");
 
     private final String value;
 

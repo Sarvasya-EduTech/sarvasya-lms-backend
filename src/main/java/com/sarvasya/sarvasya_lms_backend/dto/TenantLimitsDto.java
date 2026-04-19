@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TenantLimitsDto {
+    private String tenantId;
     private Long userLimit;
     private Long professorLimit;
     private Long adminLimit;
