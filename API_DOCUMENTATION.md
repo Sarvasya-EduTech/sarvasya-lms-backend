@@ -1,145 +1,76 @@
 # Sarvasya LMS Backend API Documentation
 
-This document provides details on the available API endpoints, their expected payloads, and testing examples using `curl`.
-
-## Base URL & Multi-Tenancy
-All API requests must be prefixed with the `tenantName` (the specific university or college you are interacting with):
-`http://localhost:8080/api/{tenantName}`
-
-*(Example: `http://localhost:8080/api/harvard`)*
-
-When an API request is made to a new tenant for the very first time, the system will automatically provision a new, isolated database schema for that tenant.
+This document provides details on the available API endpoints, their expected payloads, and the distinction between Tenant-Specific and Global Management flows.
 
 ---
 
-## 1. Authentication Endpoints
+## 1. Authentication & Platform Entry
+Authentication paths vary depending on your role. Platform Managers use the global path, while school staff/students use their specific tenant path.
 
-### 1.1 Signup
-Registers a new user in the tenant's specific database schema. The password is securely hashed using BCrypt before storing.
-
-- **URL:** `/{tenantName}/auth/signup`
+### 1.1 Global Manager Signup
+Registers a new **Tenant Manager** (Platform Owner) in the central database.
+- **URL:** `/api/auth/signup`
 - **Method:** `POST`
-- **Content-Type:** `application/json`
-
-#### Request Body
+- **Permissions:** Public (requires `signupKey`)
+- **Payload Example:**
 ```json
 {
-  "name": "John Doe",
-  "email": "johndoe@example.com",
+  "name": "Platform Admin",
+  "email": "manager@sarvasya.com",
   "password": "securepassword123",
-  "role": "professor"
+  "role": "tenant-manager",
+  "signupKey": "sarvasya-secret-key-2024"
 }
 ```
-*(Note: `role` is optional. Allowed values: `sarvasya-admin`, `admin`, `professor`, `user`. Defaults to `user` if not provided).*
 
-#### Expected Response (200 OK)
-```text
-User registered successfully!
-```
-
-#### `curl` Example
-```bash
-curl -X POST http://localhost:8080/api/harvard/auth/signup \
-  -H "Content-Type: application/json" \
-  -d "{\"name\": \"John Doe\", \"email\": \"johndoe@example.com\", \"password\": \"securepassword123\", \"role\": \"professor\"}"
-```
-
----
-
-### 1.2 Login
-Authenticates a user from the specified tenant's database and returns a JSON Web Token (JWT) that must be used for subsequent authenticated requests.
-
-- **URL:** `/{tenantName}/auth/login`
+### 1.2 Login (Dual-Path)
+Authenticates a user and returns a JWT + user metadata.
+- **Global Path (Manager):** `/api/auth/login`
+- **Tenant Path (Staff/Student):** `/api/{tenantName}/auth/login`
 - **Method:** `POST`
-- **Content-Type:** `application/json`
-
-#### Request Body
+- **Permissions:** Public
+- **Payload Example:**
 ```json
 {
-  "email": "johndoe@example.com",
+  "email": "manager@sarvasya.com",
   "password": "securepassword123"
 }
 ```
 
-#### Expected Response (200 OK)
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lQGV4...",
-  "email": "johndoe@example.com",
-  "role": "ROLE_USER"
-}
-```
-
-#### `curl` Example
-```bash
-curl -X POST http://localhost:8080/api/harvard/auth/login \
-  -H "Content-Type: application/json" \
-  -d "{\"email\": \"johndoe@example.com\", \"password\": \"securepassword123\"}"
-```
-
 ---
 
-### 1.3 Logout
-Logs out the user. Since JWTs are stateless, this endpoint clears the server-side SecurityContext. The client should also discard the token locally.
+## 2. Tenant-Specific Operations (Staff & Students)
+These endpoints use the `{tenantName}` path variable to activate a specific school's database schema.
 
-- **URL:** `/{tenantName}/auth/logout`
-- **Method:** `POST`
-- **Authorization:** `Bearer <Your-JWT-Token>`
-
-#### Expected Response (200 OK)
-```text
-Logged out successfully.
-```
-
-#### `curl` Example
-```bash
-curl -X POST http://localhost:8080/api/harvard/auth/logout \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
-```
-
----
-
-## Testing Flow (Quick Start)
-1. **Create a User:** Run the Signup `curl` command using a specific tenant (e.g., `harvard`). The system will automatically create a new database schema named `harvard` if it doesn't exist.
-2. **Log In:** Run the Login `curl` command for the same tenant. Copy the `token` string from the JSON response.
-3. **Make Authenticated Requests:** Add `-H "Authorization: Bearer <token>"` to any secured API endpoint you build in the future.
-4. **Test Data Isolation:** Try to log in with the same credentials but change the URL to a different tenant (e.g., `stanford`). It should fail because the databases are completely isolated!
-
----
-
-## 2. Theme Settings Endpoints
-
-Theme configuration for the platform is stored per tenant.
-
-### 2.1 Get Theme Settings
-Fetches the current theme configuration for the specific tenant. Unauthenticated users (e.g., the login page) can also access this to load tenant branding.
-
-- **URL:** `/api/v1/tenants/{tenantId}/theme`
-- **Method:** `GET`
-
-#### Expected Response (200 OK)
+### 2.1 Theme & Branding
+- **Get Theme:** `GET /api/v1/tenants/{tenantName}/theme`
+- **Update Theme:** `PUT /api/v1/tenants/{tenantName}/theme`
+- **Permissions:** 
+    - `GET`: Public
+    - `PUT`: `sarvasya-admin` only
+- **Payload Example:**
 ```json
 {
   "primary": {
-    "seedColor": "#009688",
-    "gradientStart": "#009688",
-    "gradientEnd": "#B2DFDB",
-    "gradientDir": 0,
-    "useGradient": false,
+    "seedColor": "#3F51B5",
+    "gradientStart": "#3F51B5",
+    "gradientEnd": "#303F9F",
+    "gradientDir": 1,
+    "useGradient": true,
     "textColor": "#FFFFFF"
   },
   "secondary": {
-    "backgroundColor": "#FFFFFF",
-    "gradientStart": "#FFFFFF",
-    "gradientEnd": "#FFFFFF",
+    "backgroundColor": "#F5F5F5",
+    "gradientStart": "#F5F5F5",
+    "gradientEnd": "#E0E0E0",
     "gradientDir": 1,
     "useGradient": false,
-    "textColor": "#1A1A1A"
+    "textColor": "#000000"
   },
   "sidebar": {
-    "seedColor": "#1E1E2C",
-    "gradientStart": "#1E1E2C",
-    "gradientEnd": "#2D2D44",
+    "seedColor": "#212121",
+    "gradientStart": "#212121",
+    "gradientEnd": "#000000",
     "gradientDir": 1,
     "useGradient": true,
     "textColor": "#FFFFFF"
@@ -147,142 +78,116 @@ Fetches the current theme configuration for the specific tenant. Unauthenticated
   "widgets": {
     "cardBackgroundColor": "#FFFFFF",
     "cardElevation": 2.0,
-    "buttonBackgroundColor": "#009688",
+    "buttonBackgroundColor": "#3F51B5",
     "buttonTextColor": "#FFFFFF",
-    "inputBackgroundColor": "#FFFFFF",
-    "inputBorderColor": "#E0E0E0"
-  }
-}
-```
-
----
-
-### 2.2 Update Theme Settings
-Updates the theme configuration. Restricted to `admin` and `sarvasya-admin` roles.
-
-- **URL:** `/api/v1/tenants/{tenantId}/theme`
-- **Method:** `PUT`
-- **Authorization:** `Bearer <Your-JWT-Token>`
-- **Content-Type:** `application/json`
-
-#### Request Body
-Same as the `GET` response body.
-
-#### Expected Response (200 OK)
-Returns the updated theme settings in the same JSON format.
-
-#### Field Definitions
-| Section | Field | Type | Description |
-| :--- | :--- | :--- | :--- |
-| **primary** | seedColor | Hex String | Primary branding color (AppBar, Nav) |
-| **widgets** | cardBackgroundColor | Hex String | Default background for all Cards |
-| **widgets** | cardElevation | Double | Depth of shadows (0.0 to 12.0) |
-| **widgets** | buttonBackgroundColor | Hex String | Fill color for primary buttons |
-| **widgets** | buttonTextColor | Hex String | Text color for primary buttons |
-| **widgets** | inputBackgroundColor | Hex String | Background for text inputs |
-| **widgets** | inputBorderColor | Hex String | Border color for text inputs |
-
----
-
-## 3. Bulk User Management & Forced Login Flow
-
-### 3.1 Initial Login & Forced Password Change
-When users (especially those created via bulk import) log in for the first time, their response will contain `"requiresPasswordChange": true` inside the nested user object.
-
-- **URL:** `/{tenantName}/auth/change-password`
-- **Method:** `POST`
-- **Authorization:** `Bearer <Your-JWT-Token>`
-
-#### Request Body
-```json
-{
-  "currentPassword": "USER_EMAIL", 
-  "newPassword": "SECURE_NEW_PASSWORD"
-}
-```
-*(Note: Bulk-created accounts have their `email` set as their initial temporary password.)*
-
----
-
-### 3.2 Bulk Create Users
-Creates multiple users at once. Restricted to `sarvasya-admin` and `admin` roles. Automatically enforces tenant limits.
-
-- **URL:** `/api/{tenantName}/users/bulk`
-- **Method:** `POST`
-- **Authorization:** `Bearer <Your-JWT-Token>`
-
-#### Request Body (JSON Array)
-```json
-[
-  {
-    "name": "Student A",
-    "email": "studenta@example.com",
-    "role": "user"
+    "inputBackgroundColor": "#FAFAFA",
+    "inputBorderColor": "#BDBDBD"
   },
-  {
-    "name": "Professor B",
-    "email": "profb@example.com",
-    "role": "professor"
-  }
-]
+  "logoUrl": "https://example.com/logo.png"
+}
 ```
 
-### 3.3 Get Bulk CSV Template
-Downloads a CSV template for bulk user imports.
-
-- **URL:** `/api/{tenantName}/users/bulk/template`
-- **Method:** `GET`
-- **Authorization:** `Bearer <Your-JWT-Token>`
-
-### 3.4 Bulk Delete Users
-Deletes multiple users by ID.
-
-- **URL:** `/api/{tenantName}/users/bulk`
-- **Method:** `DELETE`
-- **Authorization:** `Bearer <Your-JWT-Token>`
-
-#### Request Body
+### 2.2 User Management (School Level)
+- **Create User:** `POST /api/{tenantName}/users`
+- **Permissions:** `sarvasya-admin`, `admin`, `professor` (Role-restricted)
+- **Payload Example:**
 ```json
 {
-  "ids": ["UUID-1", "UUID-2"]
+  "name": "Pratham Sharma",
+  "email": "pratham@harvard.com",
+  "role": "professor"
 }
 ```
 
 ---
 
-## 4. Tenant Specific Limits Configuration
+## 3. Platform & Global Management (V1 APIs)
+These endpoints are used for cross-tenant administration. **Tenant-Managers** have full CRUD (Create, Read, Update, Delete) permissions. Other authenticated roles have **Read-Only** access to verify quotas and features.
 
-Each tenant has isolated row limits.
-
-### 4.1 Get Tenant Limits
-Fetches the active row limits configured for the current tenant.
-
-- **URL:** `/api/{tenantName}/limits`
-- **Method:** `GET`
-- **Authorization:** `Bearer <Your-JWT-Token>` (Requires `admin` or `sarvasya-admin`)
-
-#### Expected Response
+### 3.1 Global Theme Management
+- **URL:** `/api/v1/tenants/theme`
+- **Method:** `PUT`
+- **Permissions:** `tenant-manager` only
+- **Payload Example:**
 ```json
 {
-  "id": 1,
-  "userLimit": 1000,
-  "professorLimit": 150,
-  "adminLimit": 10
+  "tenantId": "harvard",
+  "primary": {
+    "seedColor": "#009688",
+    "gradientStart": "#009688",
+    "gradientEnd": "#00796B",
+    "gradientDir": 1,
+    "useGradient": true,
+    "textColor": "#FFFFFF"
+  },
+  "secondary": {
+    "backgroundColor": "#F5F5F5",
+    "textColor": "#000000"
+  },
+  "sidebar": {
+    "seedColor": "#263238",
+    "useGradient": true
+  },
+  "widgets": {
+    "cardElevation": 4.0,
+    "buttonBackgroundColor": "#009688"
+  }
 }
 ```
 
-### 4.2 Update Tenant Limits
-Overrides the active limits for the tenant. Restricted specifically to the platform owner (`sarvasya-admin`).
-
-- **URL:** `/api/{tenantName}/limits`
-- **Method:** `PUT`
-- **Authorization:** `Bearer <Your-JWT-Token>` (Requires `sarvasya-admin`)
-
-#### Request Body
+### 3.2 Resource Quotas & Limits
+- **View Limits:** `GET /api/v1/limits?tenantId=harvard`
+- **Modify Limits:** `PUT /api/v1/limits`
+- **Permissions:**
+    - `GET`: All authenticated roles
+    - `PUT`: `tenant-manager` only
+- **Payload Example:**
 ```json
 {
+  "tenantId": "harvard",
   "userLimit": 5000,
   "professorLimit": 300,
   "adminLimit": 20
+}
+```
+
+### 3.3 Tenant Configuration & Features
+- **List All Tenants:** `GET /api/v1/tenants`
+- **Get Single Config:** `GET /api/v1/tenants/{tenantId}`
+- **Update Config:** `PUT /api/v1/tenants`
+- **Permissions:**
+    - `GET`: All authenticated roles
+    - `PUT`: `tenant-manager` only
+- **Payload Example:**
+```json
+{
+  "tenantId": "harvard",
+  "features": { "basicLms": { "enabled": true } },
+  "license": { "type": "ENTERPRISE", "expiryDate": "2025-12-31" }
+}
+```
+
+### 3.4 Global User Provisioning
+Creating a school administrator globally automatically triggers the creation of the tenant schema and default configuration.
+- **URL:** `/api/v1/users`
+- **Method:** `POST`
+- **Permissions:** `tenant-manager` only
+- **Payload Example:**
+```json
+{
+  "name": "School Admin",
+  "email": "admin@harvard.com",
+  "role": "sarvasya-admin",
+  "tenantId": "harvard"
+}
+```
+
+---
+
+## 4. Error Handling: Quota Exceeded
+The system enforces strict role-based quotas. Returns `400 Bad Request` when limits are hit.
+```json
+{
+  "message": "Role Creation Quota limit exceeded. Please purchase more quota limit for it."
 }
 ```

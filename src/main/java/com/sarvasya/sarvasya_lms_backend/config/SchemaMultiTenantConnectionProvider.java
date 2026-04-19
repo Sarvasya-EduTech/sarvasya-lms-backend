@@ -18,6 +18,7 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
     public SchemaMultiTenantConnectionProvider(DataSource dataSource) {
         this.dataSource = dataSource;
+        // Don't pre-add 'tenant' here, so it gets initialized on first use
         initializedSchemas.add("public");
     }
 
@@ -36,86 +37,130 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
         Connection connection = getAnyConnection();
         
         if (!initializedSchemas.contains(tenantIdentifier)) {
-            initializeSchemaAndTables(connection, tenantIdentifier);
+            initializeSchemaAndTables(tenantIdentifier);
         }
 
-        connection.setSchema(tenantIdentifier);
+        // For PostgreSQL, setting the search_path is the most reliable way to switch schemas
+        try (Statement statement = connection.createStatement()) {
+            System.out.println("SQL: SET search_path TO \"" + tenantIdentifier + "\"");
+            statement.execute("SET search_path TO \"" + tenantIdentifier + "\"");
+        }
+        
         return connection;
     }
 
-    private synchronized void initializeSchemaAndTables(Connection connection, String tenantIdentifier) throws SQLException {
-        // Double check in case another thread initialized it while we were waiting
+    private synchronized void initializeSchemaAndTables(String tenantIdentifier) {
         if (initializedSchemas.contains(tenantIdentifier)) {
             return;
         }
 
-        try (Statement statement = connection.createStatement()) {
-            // 1. Create the schema dynamically
-            statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
-            
-            // 2. Create the required tables in this new schema
-            // (In a full production scenario, you would trigger Flyway/Liquibase here)
-            String createUsersTable = """
-                CREATE TABLE IF NOT EXISTS "%s".users (
-                    id uuid NOT NULL PRIMARY KEY,
-                    email varchar(255) NOT NULL UNIQUE,
-                    name varchar(255) NOT NULL,
-                    password varchar(255) NOT NULL,
-                    role varchar(255) NOT NULL,
-                    is_verified boolean NOT NULL DEFAULT FALSE,
-                    is_active boolean NOT NULL DEFAULT FALSE,
-                    requires_password_change boolean NOT NULL DEFAULT TRUE,
-                    created_at timestamp
-                )
-            """.formatted(tenantIdentifier);
-            
-            statement.execute(createUsersTable);
-            
-            // Ensure columns exist if table already existed
-            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_verified boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
-            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_active boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
-            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS requires_password_change boolean NOT NULL DEFAULT TRUE".formatted(tenantIdentifier));
-            statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS created_at timestamp".formatted(tenantIdentifier));
+        System.out.println(">>> START INITIALIZING schema and tables for tenant: [" + tenantIdentifier + "]");
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+            try (Statement statement = connection.createStatement()) {
+                // 1. Create the tenant-specific schema
+                System.out.println(">>> Executing: CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
+                statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
+                
+                // 2. Create central 'tenant' schema and its tables
+                statement.execute("CREATE SCHEMA IF NOT EXISTS \"tenant\"");
+                
+                String createTenantConfigTable = """
+                    CREATE TABLE IF NOT EXISTS "tenant".tenant_config (
+                        tenant_id VARCHAR(255) PRIMARY KEY,
+                        features JSONB,
+                        limits JSONB,
+                        license JSONB,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """;
+                statement.execute(createTenantConfigTable);
+    
+                String createTenantUsersTable = """
+                    CREATE TABLE IF NOT EXISTS "tenant".users (
+                        id uuid NOT NULL PRIMARY KEY,
+                        email varchar(255) NOT NULL UNIQUE,
+                        name varchar(255) NOT NULL,
+                        password varchar(255) NOT NULL,
+                        role varchar(255) NOT NULL,
+                        is_verified boolean NOT NULL DEFAULT FALSE,
+                        is_active boolean NOT NULL DEFAULT FALSE,
+                        requires_password_change boolean NOT NULL DEFAULT TRUE,
+                        created_at timestamp
+                    )
+                """;
+                statement.execute(createTenantUsersTable);
 
-            String createThemeSettingsTable = """
-                CREATE TABLE IF NOT EXISTS "%s".theme_settings (
-                    id SERIAL PRIMARY KEY,
-                    primary_seed_color VARCHAR(255),
-                    primary_gradient_start VARCHAR(255),
-                    primary_gradient_end VARCHAR(255),
-                    primary_gradient_dir INTEGER,
-                    primary_use_gradient BOOLEAN,
-                    primary_text_color VARCHAR(255),
-                    secondary_background_color VARCHAR(255),
-                    secondary_gradient_start VARCHAR(255),
-                    secondary_gradient_end VARCHAR(255),
-                    secondary_gradient_dir INTEGER,
-                    secondary_use_gradient BOOLEAN,
-                    secondary_text_color VARCHAR(255),
-                    sidebar_seed_color VARCHAR(255),
-                    sidebar_gradient_start VARCHAR(255),
-                    sidebar_gradient_end VARCHAR(255),
-                    sidebar_gradient_dir INTEGER,
-                    sidebar_use_gradient BOOLEAN,
-                    sidebar_text_color VARCHAR(255),
-                    widget_card_background_color VARCHAR(255),
-                    widget_card_elevation DOUBLE PRECISION,
-                    widget_button_background_color VARCHAR(255),
-                    widget_button_text_color VARCHAR(255),
-                    widget_input_background_color VARCHAR(255),
-                    widget_input_border_color VARCHAR(255),
-                    logo_url VARCHAR(255),
-                    logo_version BIGINT
-                )
-            """.formatted(tenantIdentifier);
-            
-            statement.execute(createThemeSettingsTable);
-            
-            // Ensure new columns exist if table already existed
-            statement.execute("ALTER TABLE \"%s\".theme_settings ADD COLUMN IF NOT EXISTS logo_url VARCHAR(255)".formatted(tenantIdentifier));
-            statement.execute("ALTER TABLE \"%s\".theme_settings ADD COLUMN IF NOT EXISTS logo_version BIGINT".formatted(tenantIdentifier));
-            
-            initializedSchemas.add(tenantIdentifier);
+
+                // 3. Create tenant-specific tables
+                if (!"tenant".equals(tenantIdentifier) && !"public".equals(tenantIdentifier)) {
+                    System.out.println(">>> Creating tenant-specific tables in: " + tenantIdentifier);
+                    String createUsersTable = """
+                        CREATE TABLE IF NOT EXISTS "%s".users (
+                            id uuid NOT NULL PRIMARY KEY,
+                            email varchar(255) NOT NULL UNIQUE,
+                            name varchar(255) NOT NULL,
+                            password varchar(255) NOT NULL,
+                            role varchar(255) NOT NULL,
+                            is_verified boolean NOT NULL DEFAULT FALSE,
+                            is_active boolean NOT NULL DEFAULT FALSE,
+                            requires_password_change boolean NOT NULL DEFAULT TRUE,
+                            created_at timestamp
+                        )
+                    """.formatted(tenantIdentifier);
+                    statement.execute(createUsersTable);
+                    
+                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_verified boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
+                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_active boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
+                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS requires_password_change boolean NOT NULL DEFAULT TRUE".formatted(tenantIdentifier));
+                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS created_at timestamp".formatted(tenantIdentifier));
+        
+                    String createThemeSettingsTable = """
+                        CREATE TABLE IF NOT EXISTS "%s".theme_settings (
+                            id SERIAL PRIMARY KEY,
+                            primary_seed_color VARCHAR(255),
+                            primary_gradient_start VARCHAR(255),
+                            primary_gradient_end VARCHAR(255),
+                            primary_gradient_dir INTEGER,
+                            primary_use_gradient BOOLEAN,
+                            primary_text_color VARCHAR(255),
+                            secondary_background_color VARCHAR(255),
+                            secondary_gradient_start VARCHAR(255),
+                            secondary_gradient_end VARCHAR(255),
+                            secondary_gradient_dir INTEGER,
+                            secondary_use_gradient BOOLEAN,
+                            secondary_text_color VARCHAR(255),
+                            sidebar_seed_color VARCHAR(255),
+                            sidebar_gradient_start VARCHAR(255),
+                            sidebar_gradient_end VARCHAR(255),
+                            sidebar_gradient_dir INTEGER,
+                            sidebar_use_gradient BOOLEAN,
+                            sidebar_text_color VARCHAR(255),
+                            widget_card_background_color VARCHAR(255),
+                            widget_card_elevation DOUBLE PRECISION,
+                            widget_button_background_color VARCHAR(255),
+                            widget_button_text_color VARCHAR(255),
+                            widget_input_background_color VARCHAR(255),
+                            widget_input_border_color VARCHAR(255),
+                            logo_url VARCHAR(255),
+                            logo_version BIGINT
+                        )
+                    """.formatted(tenantIdentifier);
+                    statement.execute(createThemeSettingsTable);
+                    statement.execute("ALTER TABLE \"%s\".theme_settings ADD COLUMN IF NOT EXISTS logo_version BIGINT".formatted(tenantIdentifier));
+                }
+                
+                connection.commit();
+                initializedSchemas.add(tenantIdentifier);
+                System.out.println(">>> SUCCESSFULLY INITIALIZED tenant: " + tenantIdentifier);
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            System.err.println("!!! CRITICAL ERROR initializing schema for [" + tenantIdentifier + "]: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Could not initialize tenant schema", e);
         }
     }
 
@@ -138,5 +183,9 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
     @Override
     public <T> T unwrap(Class<T> unwrapType) {
         return null;
+    }
+
+    public Set<String> getAllTenants() {
+        return initializedSchemas;
     }
 }

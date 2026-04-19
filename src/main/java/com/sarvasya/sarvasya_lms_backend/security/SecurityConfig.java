@@ -33,6 +33,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/*/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/tenants/*/theme").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/tenants/*/theme/logo/**").permitAll()

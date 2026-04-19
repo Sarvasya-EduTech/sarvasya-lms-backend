@@ -17,21 +17,26 @@ public class TenantFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        
-        // Example path: /api/harvard/auth/login or /api/v1/tenants/harvard/theme
-        if (path.startsWith("/api/v1/tenants/")) {
+
+        if (path.startsWith("/api/auth/")) {
+            TenantContext.setTenantId("tenant");
+        } else if (path.startsWith("/api/v1/")) {
             String[] parts = path.split("/");
-            // parts[0] = "", parts[1] = "api", parts[2] = "v1", parts[3] = "tenants", parts[4] = "{tenantName}"
-            if (parts.length >= 5) {
-                String tenantName = parts[4];
-                TenantContext.setTenantId(tenantName);
+            // Example: /api/v1/tenants/harvard/theme -> parts.length = 6, parts[4] = harvard
+            // Parts: ["", "api", "v1", "tenants", "harvard", "theme"]
+            if (path.startsWith("/api/v1/tenants/") && parts.length >= 5 && !parts[4].isBlank() && !parts[4].equals("theme")) {
+                TenantContext.setTenantId(parts[4]); // Extract specific tenant
+            } else {
+                // Global management: /api/v1/tenants, /api/v1/limits, /api/v1/users
+                TenantContext.setTenantId("tenant"); // Default to central platform schema
             }
         } else if (path.startsWith("/api/")) {
             String[] parts = path.split("/");
-            // parts[0] = "", parts[1] = "api", parts[2] = "{tenantName}"
             if (parts.length >= 3) {
                 String tenantName = parts[2];
-                TenantContext.setTenantId(tenantName);
+                if (!tenantName.equals("v1") && !tenantName.equals("auth")) {
+                    TenantContext.setTenantId(tenantName);
+                }
             }
         }
 

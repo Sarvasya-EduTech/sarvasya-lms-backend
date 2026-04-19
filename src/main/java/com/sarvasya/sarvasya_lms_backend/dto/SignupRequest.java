@@ -18,5 +18,7 @@ public class SignupRequest {
 
     private String role;
 
+    private String signupKey;
+
     private boolean requiresPasswordChange;
 }

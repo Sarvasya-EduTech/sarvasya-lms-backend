@@ -15,30 +15,49 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @RestController
-@RequestMapping("/api/v1/tenants/{tenantId}/theme")
+@RequestMapping("/api/v1/tenants")
 @RequiredArgsConstructor
 public class ThemeController {
 
     private final ThemeSettingsService themeSettingsService;
     private static final String UPLOAD_DIR = "uploads/logos";
 
-    @GetMapping
+    @GetMapping("/{tenantId}/theme")
     public ResponseEntity<ThemeSettingsDto> getThemeSettings(@PathVariable("tenantId") String tenantId) {
         return ResponseEntity.ok(themeSettingsService.getThemeSettings());
     }
 
-    @PutMapping
-    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'ROLE_sarvasya-admin', 'SARVASYA_ADMIN')")
-    public ResponseEntity<?> updateThemeSettings(
+    @PutMapping("/{tenantId}/theme")
+    @PreAuthorize("hasAuthority('sarvasya-admin')")
+    public ResponseEntity<?> updateThemeSettingsLocal(
             @PathVariable("tenantId") String tenantId,
             @RequestBody ThemeSettingsDto themeSettingsDto) {
-        System.out.println("Updating theme for tenant: " + tenantId);
         themeSettingsService.updateThemeSettings(themeSettingsDto);
         return ResponseEntity.ok(java.util.Map.of("message", "Theme updated successfully"));
     }
 
-    @PostMapping("/logo")
-    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'ROLE_sarvasya-admin', 'SARVASYA_ADMIN')")
+    // Global Manager update (No tenantId in URL)
+    @PutMapping("/theme")
+    @PreAuthorize("hasAuthority('tenant-manager')")
+    public ResponseEntity<?> updateThemeSettingsGlobal(@RequestBody ThemeSettingsDto dto) {
+        String targetTenantId = dto.getTenantId();
+        if (targetTenantId == null || targetTenantId.isBlank()) {
+            return ResponseEntity.badRequest().body("Error: tenantId is required in the request body for global updates.");
+        }
+
+        String originalTenant = com.sarvasya.sarvasya_lms_backend.security.TenantContext.getTenantId();
+        try {
+            com.sarvasya.sarvasya_lms_backend.security.TenantContext.setTenantId(targetTenantId);
+            themeSettingsService.updateThemeSettings(dto);
+        } finally {
+            com.sarvasya.sarvasya_lms_backend.security.TenantContext.setTenantId(originalTenant);
+        }
+        return ResponseEntity.ok(java.util.Map.of("message", "Global theme update successful for " + targetTenantId));
+    }
+
+
+    @PostMapping("/{tenantId}/theme/logo")
+    @PreAuthorize("hasAuthority('tenant-manager') or hasAuthority('sarvasya-admin')")
     public ResponseEntity<?> uploadLogo(
             @PathVariable("tenantId") String tenantId,
             @RequestParam("file") MultipartFile file) {
@@ -79,7 +98,7 @@ public class ThemeController {
         }
     }
 
-    @GetMapping("/logo/{fileName:.+}")
+    @GetMapping("/{tenantId}/theme/logo/{fileName:.+}")
     public ResponseEntity<org.springframework.core.io.Resource> getLogo(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("fileName") String fileName) {
@@ -98,7 +117,7 @@ public class ThemeController {
             return ResponseEntity.status(500).build();
         }
     }
-    @DeleteMapping("/logo")
+    @DeleteMapping("/{tenantId}/theme/logo")
     public ResponseEntity<?> deleteLogo(@PathVariable("tenantId") String tenantId) {
         System.out.println(">>> DELETE LOGO REQUEST for tenant: " + tenantId);
         

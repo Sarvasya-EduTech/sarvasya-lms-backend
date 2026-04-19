@@ -16,6 +16,7 @@ public class ThemeSettingsDto {
     private WidgetThemeDto widgets;
     private String logoUrl;
     private Long logoVersion;
+    private String tenantId;
     
     @Data
     @Builder

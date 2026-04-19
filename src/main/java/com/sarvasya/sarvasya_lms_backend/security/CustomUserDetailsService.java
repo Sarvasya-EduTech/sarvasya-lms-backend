@@ -19,8 +19,24 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+        // First try to find user in the current context schema
+        User user = userRepository.findByEmail(username).orElse(null);
+
+        // Fallback: If not found in current schema, check the central 'tenant' schema
+        // This allows TENANT_MANAGERs (who live in 'tenant' schema) to access tenant-specific APIs
+        if (user == null && !"tenant".equals(TenantContext.getTenantId())) {
+            String originalTenant = TenantContext.getTenantId();
+            try {
+                TenantContext.setTenantId("tenant");
+                user = userRepository.findByEmail(username).orElse(null);
+            } finally {
+                TenantContext.setTenantId(originalTenant);
+            }
+        }
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + username);
+        }
 
         String authority = (user.getRole() != null) ? user.getRole().getValue() : "user";
         System.out.println(">>> Loading user: " + user.getEmail() + " with authority: " + authority);
