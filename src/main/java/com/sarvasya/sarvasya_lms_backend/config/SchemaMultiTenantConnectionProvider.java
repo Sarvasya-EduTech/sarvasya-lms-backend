@@ -1,6 +1,7 @@
 package com.sarvasya.sarvasya_lms_backend.config;
 
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -15,6 +16,9 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
     private final DataSource dataSource;
     private final Set<String> initializedSchemas = ConcurrentHashMap.newKeySet();
+
+    @Autowired(required = false)
+    private FlywayConfig flywayConfig;
 
     public SchemaMultiTenantConnectionProvider(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -35,17 +39,18 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
     @Override
     public Connection getConnection(String tenantIdentifier) throws SQLException {
         Connection connection = getAnyConnection();
-        
+
         if (!initializedSchemas.contains(tenantIdentifier)) {
             initializeSchemaAndTables(tenantIdentifier);
         }
 
-        // For PostgreSQL, setting the search_path is the most reliable way to switch schemas
+        // For PostgreSQL, setting the search_path is the most reliable way to switch
+        // schemas
         try (Statement statement = connection.createStatement()) {
             System.out.println("SQL: SET search_path TO \"" + tenantIdentifier + "\"");
             statement.execute("SET search_path TO \"" + tenantIdentifier + "\"");
         }
-        
+
         return connection;
     }
 
@@ -54,102 +59,32 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
             return;
         }
 
-        System.out.println(">>> START INITIALIZING schema and tables for tenant: [" + tenantIdentifier + "]");
+        System.out.println(">>> START INITIALIZING schema for tenant: [" + tenantIdentifier + "]");
+
+        if (flywayConfig != null) {
+            // Use Flyway for migration
+            try {
+                flywayConfig.migrateTenantSchema(dataSource, tenantIdentifier);
+                initializedSchemas.add(tenantIdentifier);
+            } catch (Exception e) {
+                System.err.println(
+                        "!!! CRITICAL ERROR migrating tenant schema [" + tenantIdentifier + "]: " + e.getMessage());
+                e.printStackTrace();
+                throw new RuntimeException("Could not initialize tenant schema", e);
+            }
+        } else {
+            // Fallback: Manual schema creation if Flyway is not available
+            initializeSchemaManually(tenantIdentifier);
+        }
+    }
+
+    private void initializeSchemaManually(String tenantIdentifier) {
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             try (Statement statement = connection.createStatement()) {
-                // 1. Create the tenant-specific schema
+                // Create the tenant-specific schema
                 System.out.println(">>> Executing: CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
                 statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
-                
-                // 2. Create central 'tenant' schema and its tables
-                statement.execute("CREATE SCHEMA IF NOT EXISTS \"tenant\"");
-                
-                String createTenantConfigTable = """
-                    CREATE TABLE IF NOT EXISTS "tenant".tenant_config (
-                        tenant_id VARCHAR(255) PRIMARY KEY,
-                        features JSONB,
-                        limits JSONB,
-                        license JSONB,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """;
-                statement.execute(createTenantConfigTable);
-    
-                String createTenantUsersTable = """
-                    CREATE TABLE IF NOT EXISTS "tenant".users (
-                        id uuid NOT NULL PRIMARY KEY,
-                        email varchar(255) NOT NULL UNIQUE,
-                        name varchar(255) NOT NULL,
-                        password varchar(255) NOT NULL,
-                        role varchar(255) NOT NULL,
-                        is_verified boolean NOT NULL DEFAULT FALSE,
-                        is_active boolean NOT NULL DEFAULT FALSE,
-                        requires_password_change boolean NOT NULL DEFAULT TRUE,
-                        created_at timestamp
-                    )
-                """;
-                statement.execute(createTenantUsersTable);
-
-
-                // 3. Create tenant-specific tables
-                if (!"tenant".equals(tenantIdentifier) && !"public".equals(tenantIdentifier)) {
-                    System.out.println(">>> Creating tenant-specific tables in: " + tenantIdentifier);
-                    String createUsersTable = """
-                        CREATE TABLE IF NOT EXISTS "%s".users (
-                            id uuid NOT NULL PRIMARY KEY,
-                            email varchar(255) NOT NULL UNIQUE,
-                            name varchar(255) NOT NULL,
-                            password varchar(255) NOT NULL,
-                            role varchar(255) NOT NULL,
-                            is_verified boolean NOT NULL DEFAULT FALSE,
-                            is_active boolean NOT NULL DEFAULT FALSE,
-                            requires_password_change boolean NOT NULL DEFAULT TRUE,
-                            created_at timestamp
-                        )
-                    """.formatted(tenantIdentifier);
-                    statement.execute(createUsersTable);
-                    
-                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_verified boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
-                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS is_active boolean NOT NULL DEFAULT FALSE".formatted(tenantIdentifier));
-                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS requires_password_change boolean NOT NULL DEFAULT TRUE".formatted(tenantIdentifier));
-                    statement.execute("ALTER TABLE \"%s\".users ADD COLUMN IF NOT EXISTS created_at timestamp".formatted(tenantIdentifier));
-        
-                    String createThemeSettingsTable = """
-                        CREATE TABLE IF NOT EXISTS "%s".theme_settings (
-                            id SERIAL PRIMARY KEY,
-                            primary_seed_color VARCHAR(255),
-                            primary_gradient_start VARCHAR(255),
-                            primary_gradient_end VARCHAR(255),
-                            primary_gradient_dir INTEGER,
-                            primary_use_gradient BOOLEAN,
-                            primary_text_color VARCHAR(255),
-                            secondary_background_color VARCHAR(255),
-                            secondary_gradient_start VARCHAR(255),
-                            secondary_gradient_end VARCHAR(255),
-                            secondary_gradient_dir INTEGER,
-                            secondary_use_gradient BOOLEAN,
-                            secondary_text_color VARCHAR(255),
-                            sidebar_seed_color VARCHAR(255),
-                            sidebar_gradient_start VARCHAR(255),
-                            sidebar_gradient_end VARCHAR(255),
-                            sidebar_gradient_dir INTEGER,
-                            sidebar_use_gradient BOOLEAN,
-                            sidebar_text_color VARCHAR(255),
-                            widget_card_background_color VARCHAR(255),
-                            widget_card_elevation DOUBLE PRECISION,
-                            widget_button_background_color VARCHAR(255),
-                            widget_button_text_color VARCHAR(255),
-                            widget_input_background_color VARCHAR(255),
-                            widget_input_border_color VARCHAR(255),
-                            logo_url VARCHAR(255),
-                            logo_version BIGINT
-                        )
-                    """.formatted(tenantIdentifier);
-                    statement.execute(createThemeSettingsTable);
-                    statement.execute("ALTER TABLE \"%s\".theme_settings ADD COLUMN IF NOT EXISTS logo_version BIGINT".formatted(tenantIdentifier));
-                }
-                
                 connection.commit();
                 initializedSchemas.add(tenantIdentifier);
                 System.out.println(">>> SUCCESSFULLY INITIALIZED tenant: " + tenantIdentifier);
@@ -158,7 +93,8 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
                 throw e;
             }
         } catch (SQLException e) {
-            System.err.println("!!! CRITICAL ERROR initializing schema for [" + tenantIdentifier + "]: " + e.getMessage());
+            System.err.println(
+                    "!!! CRITICAL ERROR initializing schema for [" + tenantIdentifier + "]: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Could not initialize tenant schema", e);
         }
@@ -166,8 +102,13 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
     @Override
     public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
-        connection.setSchema("public");
-        connection.close();
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("SET search_path TO public");
+        } catch (SQLException e) {
+            System.err.println("!!! Error resetting search_path on connection release: " + e.getMessage());
+        } finally {
+            connection.close();
+        }
     }
 
     @Override
