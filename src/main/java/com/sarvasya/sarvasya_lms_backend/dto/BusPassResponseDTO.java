@@ -13,6 +13,8 @@ public class BusPassResponseDTO {
     private UUID id;
     private UserInfo user;
     private BusInfo bus;
+    private String stopName;
+    private String stopId;
     private LocalDate validFrom;
     private LocalDate validTo;
     private String status;
@@ -45,6 +47,8 @@ public class BusPassResponseDTO {
                         .id(busPass.getBus().getId())
                         .busNumber(busPass.getBus().getBusNumber())
                         .build())
+                .stopName(busPass.getStop() != null ? busPass.getStop().getStopName() : null)
+                .stopId(busPass.getStop() != null ? busPass.getStop().getId().toString() : null)
                 .validFrom(busPass.getValidFrom())
                 .validTo(busPass.getValidTo())
                 .status(busPass.getStatus().name())

@@ -69,8 +69,12 @@ public class FlywayConfig {
                     .schemas(tenantIdentifier)
                     .table("flyway_schema_history") // Separate history table per schema
                     .placeholders(Map.of("schema", tenantIdentifier))
+                    .outOfOrder(false)
+                    .validateOnMigrate(true)
                     .load();
 
+            // Repair checksums first (handles cases where migration files were updated)
+            tenantFlyway.repair();
             tenantFlyway.migrate();
 
             migratedSchemas.add(tenantIdentifier);

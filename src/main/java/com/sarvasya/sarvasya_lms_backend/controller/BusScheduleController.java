@@ -1,6 +1,8 @@
 package com.sarvasya.sarvasya_lms_backend.controller;
 
+import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleCreateRequest;
 import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleResponseDTO;
+import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleUpdateRequest;
 import com.sarvasya.sarvasya_lms_backend.model.BusSchedule;
 import com.sarvasya.sarvasya_lms_backend.service.BusScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +22,12 @@ public class BusScheduleController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<BusScheduleResponseDTO> createBusSchedule(@RequestBody BusSchedule busSchedule) {
+    public ResponseEntity<BusScheduleResponseDTO> createBusSchedule(@RequestBody BusScheduleCreateRequest request) {
         try {
-            BusScheduleResponseDTO created = busScheduleService.createBusSchedule(busSchedule);
+            BusScheduleResponseDTO created = busScheduleService.createBusSchedule(request);
             return ResponseEntity.ok(created);
         } catch (Exception e) {
+            e.printStackTrace(); // Log the error for debugging
             return ResponseEntity.status(400).build();
         }
     }
@@ -57,9 +60,9 @@ public class BusScheduleController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<BusScheduleResponseDTO> updateBusSchedule(@PathVariable UUID id,
-            @RequestBody BusSchedule scheduleDetails) {
+            @RequestBody BusScheduleUpdateRequest request) {
         try {
-            BusScheduleResponseDTO updated = busScheduleService.updateBusSchedule(id, scheduleDetails);
+            BusScheduleResponseDTO updated = busScheduleService.updateBusSchedule(id, request);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();

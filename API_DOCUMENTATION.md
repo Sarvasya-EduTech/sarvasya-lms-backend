@@ -249,10 +249,15 @@ These endpoints manage buses, bus schedules, and bus passes for transportation w
 - **Payload Example:**
 ```json
 {
-  "bus": { "id": "uuid-of-bus" },
+  "busId": "uuid-of-bus",
   "routeName": "Route A - Downtown",
   "startTime": "08:00:00",
-  "endTime": "18:00:00"
+  "endTime": "18:00:00",
+  "stops": [
+    { "stopName": "Main Gate", "arrivalTime": "08:00:00" },
+    { "stopName": "Library", "arrivalTime": "08:15:00" },
+    { "stopName": "Hostel Block A", "arrivalTime": "08:30:00" }
+  ]
 }
 ```
 
@@ -267,6 +272,11 @@ These endpoints manage buses, bus schedules, and bus passes for transportation w
   "routeName": "Route A - Downtown",
   "startTime": "08:00:00",
   "endTime": "18:00:00",
+  "stops": [
+    { "stopName": "Main Gate", "arrivalTime": "08:00:00" },
+    { "stopName": "Library", "arrivalTime": "08:15:00" },
+    { "stopName": "Hostel Block A", "arrivalTime": "08:30:00" }
+  ],
   "createdAt": "2024-01-01T12:00:00"
 }
 ```
@@ -293,7 +303,7 @@ These endpoints manage buses, bus schedules, and bus passes for transportation w
 - **Payload Example:**
 ```json
 {
-  "bus": { "id": "uuid-of-bus" },
+  "busId": "uuid-of-bus",
   "routeName": "Route A - Downtown",
   "startTime": "07:30:00",
   "endTime": "18:30:00"
@@ -315,6 +325,7 @@ These endpoints manage buses, bus schedules, and bus passes for transportation w
 {
   "userName": "John Doe",
   "busId": "uuid-of-bus",
+  "stopName": "Library",
   "validFrom": "2024-01-01",
   "validTo": "2024-12-31"
 }
@@ -333,6 +344,7 @@ These endpoints manage buses, bus schedules, and bus passes for transportation w
     "id": "uuid-of-bus",
     "busNumber": "BUS-001"
   },
+  "stopName": "Library",
   "validFrom": "2024-01-01",
   "validTo": "2024-12-31",
   "status": "ACTIVE",

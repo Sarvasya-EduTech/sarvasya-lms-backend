@@ -2,6 +2,7 @@ package com.sarvasya.sarvasya_lms_backend.controller;
 
 import com.sarvasya.sarvasya_lms_backend.dto.BusPassCreateRequest;
 import com.sarvasya.sarvasya_lms_backend.dto.BusPassResponseDTO;
+import com.sarvasya.sarvasya_lms_backend.dto.BusPassUpdateRequest;
 import com.sarvasya.sarvasya_lms_backend.model.BusPass;
 import com.sarvasya.sarvasya_lms_backend.service.BusPassService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class BusPassController {
             BusPassResponseDTO created = busPassService.createBusPass(request);
             return ResponseEntity.ok(created);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(400).build();
         }
     }
@@ -64,11 +66,12 @@ public class BusPassController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<BusPassResponseDTO> updateBusPass(@PathVariable UUID id, @RequestBody BusPass passDetails) {
+    public ResponseEntity<BusPassResponseDTO> updateBusPass(@PathVariable UUID id, @RequestBody BusPassUpdateRequest request) {
         try {
-            BusPassResponseDTO updated = busPassService.updateBusPass(id, passDetails);
+            BusPassResponseDTO updated = busPassService.updateBusPass(id, request);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.notFound().build();
         }
     }

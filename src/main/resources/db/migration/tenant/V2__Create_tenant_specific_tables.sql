@@ -51,29 +51,45 @@ CREATE TABLE IF NOT EXISTS buses (
     id UUID NOT NULL PRIMARY KEY,
     bus_number VARCHAR(255) NOT NULL,
     capacity INTEGER NOT NULL,
-    created_at TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create bus_stops table (Master list of stops per bus)
+CREATE TABLE IF NOT EXISTS bus_stops (
+    id UUID NOT NULL PRIMARY KEY,
+    bus_id UUID NOT NULL REFERENCES buses(id) ON DELETE CASCADE,
+    stop_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_bus_stop UNIQUE (bus_id, stop_name)
 );
 
 -- Create bus_schedules table
 CREATE TABLE IF NOT EXISTS bus_schedules (
     id UUID NOT NULL PRIMARY KEY,
-    bus_id UUID NOT NULL,
+    bus_id UUID NOT NULL REFERENCES buses(id) ON DELETE CASCADE,
     route_name VARCHAR(255) NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    created_at TIMESTAMP,
-    CONSTRAINT fk_bus_schedule_bus FOREIGN KEY (bus_id) REFERENCES buses(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create bus_schedule_stops table (Links schedules to stops with arrival times)
+CREATE TABLE IF NOT EXISTS bus_schedule_stops (
+    id UUID NOT NULL PRIMARY KEY,
+    schedule_id UUID NOT NULL REFERENCES bus_schedules(id) ON DELETE CASCADE,
+    stop_id UUID NOT NULL REFERENCES bus_stops(id) ON DELETE CASCADE,
+    arrival_time TIME NOT NULL,
+    sequence_number INTEGER DEFAULT 0
 );
 
 -- Create bus_passes table
 CREATE TABLE IF NOT EXISTS bus_passes (
     id UUID NOT NULL PRIMARY KEY,
-    user_id UUID NOT NULL,
-    bus_id UUID NOT NULL,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    bus_id UUID NOT NULL REFERENCES buses(id) ON DELETE CASCADE,
+    stop_id UUID REFERENCES bus_stops(id) ON DELETE SET NULL,
     valid_from DATE NOT NULL,
     valid_to DATE NOT NULL,
     status VARCHAR(255) NOT NULL DEFAULT 'ACTIVE',
-    created_at TIMESTAMP,
-    CONSTRAINT fk_bus_pass_user FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT fk_bus_pass_bus FOREIGN KEY (bus_id) REFERENCES buses(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

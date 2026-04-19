@@ -102,8 +102,13 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
     @Override
     public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
-        connection.setSchema("public");
-        connection.close();
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("SET search_path TO public");
+        } catch (SQLException e) {
+            System.err.println("!!! Error resetting search_path on connection release: " + e.getMessage());
+        } finally {
+            connection.close();
+        }
     }
 
     @Override
