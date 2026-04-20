@@ -96,8 +96,8 @@ public class UserService {
                     .requiresPasswordChange(true)
                     .isVerified(true) // Bulk created users are likely pre-verified by admin
                     .isActive(true)
-                    .classId(req.getClassId() != null ? UUID.fromString(req.getClassId()) : null)
-                    .departmentId(req.getDepartmentId() != null ? UUID.fromString(req.getDepartmentId()) : null)
+                    .classId(req.getClassId() != null && !req.getClassId().isEmpty() ? UUID.fromString(req.getClassId()) : null)
+                    .departmentId(req.getDepartmentId() != null && !req.getDepartmentId().isEmpty() ? UUID.fromString(req.getDepartmentId()) : null)
                     .build();
 
             usersToSave.add(user);
@@ -164,8 +164,8 @@ public class UserService {
                 .requiresPasswordChange(passwordChangeRequired)
                 .isVerified(true)
                 .isActive(true)
-                .classId(req.getClassId() != null ? UUID.fromString(req.getClassId()) : null)
-                .departmentId(req.getDepartmentId() != null ? UUID.fromString(req.getDepartmentId()) : null)
+                .classId(req.getClassId() != null && !req.getClassId().isEmpty() ? UUID.fromString(req.getClassId()) : null)
+                .departmentId(req.getDepartmentId() != null && !req.getDepartmentId().isEmpty() ? UUID.fromString(req.getDepartmentId()) : null)
                 .build();
 
         userRepository.saveAndFlush(user);

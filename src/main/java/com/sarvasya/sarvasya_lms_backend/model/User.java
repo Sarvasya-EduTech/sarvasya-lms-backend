@@ -65,5 +65,4 @@ public class User {
 
     @Column(name = "department_id")
     private UUID departmentId;
-
 }
