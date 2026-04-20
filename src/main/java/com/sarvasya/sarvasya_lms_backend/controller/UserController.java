@@ -121,6 +121,26 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{tenantName}/users/profile")
+    public ResponseEntity<?> getUserProfile(@PathVariable String tenantName) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String email = auth.getName();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            
+            Map<String, Object> map = new java.util.LinkedHashMap<>();
+            map.put("id", user.getId());
+            map.put("name", user.getName());
+            map.put("email", user.getEmail());
+            map.put("role", user.getRole().getValue());
+            map.put("degreeId", user.getDegreeId());
+            return ResponseEntity.ok(map);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/{tenantName}/users")
     @PreAuthorize("hasAuthority('sarvasya-admin') or hasAuthority('admin') or hasAuthority('professor')")
     public ResponseEntity<?> listUsers(@PathVariable String tenantName) {
