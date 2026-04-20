@@ -13,11 +13,11 @@ public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver
         if (tenantId != null && !tenantId.isBlank()) {
             return tenantId;
         }
-        return "tenant"; // default schema
+        return "public"; // fall back to public — no tenant context (e.g. during login)
     }
 
     @Override
     public boolean validateExistingCurrentSessions() {
-        return true;
+        return false; // prevent session re-validation when tenant changes
     }
 }

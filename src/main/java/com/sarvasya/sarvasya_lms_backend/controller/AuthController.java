@@ -77,16 +77,20 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
         );
-
+ 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         
-        java.util.Map<String, Object> extraClaims = new java.util.HashMap<>();
-        extraClaims.put("tenantId", com.sarvasya.sarvasya_lms_backend.security.TenantContext.getTenantId());
-        String jwt = jwtUtil.generateToken(userDetails, extraClaims);
-        
         User user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow();
 
+        java.util.Map<String, Object> extraClaims = new java.util.HashMap<>();
+        extraClaims.put("tenantId", com.sarvasya.sarvasya_lms_backend.security.TenantContext.getTenantId());
+        extraClaims.put("id", user.getId().toString());
+        extraClaims.put("name", user.getName());
+        extraClaims.put("role", user.getRole().getValue());
+
+        String jwt = jwtUtil.generateToken(userDetails, extraClaims);
+        
         AuthResponse.UserDto userDto = new AuthResponse.UserDto(
                 user.getId(),
                 user.getEmail(),

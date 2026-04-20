@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "bus_stops", uniqueConstraints = {@UniqueConstraint(columnNames = {"bus_id", "stop_name"})})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class User {
+public class BusStop {
 
     @Id
     @Column(updatable = false, nullable = false)
@@ -31,30 +31,12 @@ public class User {
         }
     }
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bus_id", nullable = false)
+    private Bus bus;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
-
-    @Column(name = "is_verified", nullable = false)
-    @Builder.Default
-    private Boolean isVerified = false;
-
-    @Column(name = "is_active", nullable = false)
-    @Builder.Default
-    private Boolean isActive = false;
-
-    @Column(name = "requires_password_change", nullable = false)
-    @Builder.Default
-    private boolean requiresPasswordChange = true;
+    @Column(name = "stop_name", nullable = false)
+    private String stopName;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
