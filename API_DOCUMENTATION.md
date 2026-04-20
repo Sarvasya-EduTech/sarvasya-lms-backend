@@ -191,3 +191,69 @@ The system enforces strict role-based quotas. Returns `400 Bad Request` when lim
   "message": "Role Creation Quota limit exceeded. Please purchase more quota limit for it."
 }
 ```
+
+---
+
+## 5. Scheduling & Calendar Operations
+These endpoints are tenant-specific and handle all calendar events, classes, and exams.
+
+### 5.1 Calendar Management
+Manages the unified calendar which handles classes, exams, assignments, events, and holidays.
+- **Get Calendar Items:** `GET /api/{tenantName}/calendar?start={startDate}&end={endDate}`
+- **Create Calendar Item:** `POST /api/{tenantName}/calendar`
+- **Permissions:** 
+    - `GET`: All authenticated roles
+    - `POST`: `sarvasya-admin`, `admin`, `professor`
+- **Payload Example (Event):**
+```json
+{
+  "title": "Annual Sports Meet",
+  "description": "Inter-school sports competition.",
+  "type": "EVENT",
+  "startDateTime": "2026-10-15T09:00:00",
+  "endDateTime": "2026-10-17T17:00:00",
+  "allDay": true,
+  "colorCode": "#FF5722"
+}
+```
+- **Payload Example (Class - requires referenceId):**
+```json
+{
+  "title": "Mathematics 101",
+  "type": "CLASS",
+  "startDateTime": "2026-05-10T10:00:00",
+  "endDateTime": "2026-05-10T11:00:00",
+  "allDay": false,
+  "referenceId": "018f6c44-32a1-77b3-90ea-f2ab8790b1c1",
+  "referenceType": "CLASS",
+  "colorCode": "#2196F3"
+}
+```
+
+### 5.2 Classes Management
+Manages minimalist class entities linked to calendar items. Used primarily for attendance mapping.
+- **Get Classes:** `GET /api/{tenantName}/classes`
+- **Create Class:** `POST /api/{tenantName}/classes`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "subject": "Mathematics",
+  "batchId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
+  "teacherId": "018f6c43-1d4e-761a-b33c-f4ab9801d3b4"
+}
+```
+
+### 5.3 Exam Management
+Manages minimalist exam entities linked to calendar items. Used primarily for admit card generation and grading.
+- **Get Exams:** `GET /api/{tenantName}/exams`
+- **Create Exam:** `POST /api/{tenantName}/exams`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "subject": "Physics Midterm",
+  "batchId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
+  "totalMarks": 100
+}
+```
