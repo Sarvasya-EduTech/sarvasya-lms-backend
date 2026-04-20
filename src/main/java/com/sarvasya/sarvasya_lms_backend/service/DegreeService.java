@@ -22,6 +22,10 @@ public class DegreeService {
         return repository.save(degree);
     }
 
+    public java.util.Optional<Degree> findById(UUID id) {
+        return repository.findById(id);
+    }
+
     public void delete(UUID id) {
         repository.deleteById(id);
     }
