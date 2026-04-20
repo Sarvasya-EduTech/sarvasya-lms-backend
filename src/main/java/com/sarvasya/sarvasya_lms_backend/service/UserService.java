@@ -342,4 +342,8 @@ public class UserService {
         }
         return name.trim().toLowerCase();
     }
+
+    public List<User> getUsersByClassId(UUID classId) {
+        return userRepository.findByClassId(classId);
+    }
 }

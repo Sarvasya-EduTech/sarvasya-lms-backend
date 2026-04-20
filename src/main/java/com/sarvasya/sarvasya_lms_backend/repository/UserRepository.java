@@ -13,4 +13,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByName(String name);
     Boolean existsByEmail(String email);
     long countByRole(com.sarvasya.sarvasya_lms_backend.model.Role role);
+    java.util.List<User> findByClassId(UUID classId);
 }

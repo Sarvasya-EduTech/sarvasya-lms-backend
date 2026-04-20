@@ -1,6 +1,7 @@
 package com.sarvasya.sarvasya_lms_backend.service;
 
 import com.sarvasya.sarvasya_lms_backend.model.CalendarItem;
+import com.sarvasya.sarvasya_lms_backend.model.CalendarItemType;
 import com.sarvasya.sarvasya_lms_backend.repository.CalendarItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,17 @@ public class CalendarItemService {
             return repository.findByStartDateTimeBetween(start, end);
         }
         return findAll();
+    }
+
+    public List<CalendarItem> findForStudent(UUID classId) {
+        List<CalendarItemType> globalTypes = List.of(CalendarItemType.EVENT, CalendarItemType.HOLIDAY);
+        if (classId == null) {
+            // If student has no class assigned, only show global items
+            return repository.findAll().stream()
+                    .filter(item -> globalTypes.contains(item.getType()))
+                    .toList();
+        }
+        return repository.findByClassIdOrGlobalTypes(classId, globalTypes);
     }
 
     public CalendarItem save(CalendarItem item) {
