@@ -1,5 +1,6 @@
 package com.sarvasya.sarvasya_lms_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,16 +16,20 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Classes {
 
     @Id
     @Column(updatable = false, nullable = false)
     private UUID id;
 
+    @Column(nullable = false)
+    private String subject;
+
     @Column(name = "course_id")
     private UUID courseId;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "class_course",
         joinColumns = @JoinColumn(name = "class_id"),
         inverseJoinColumns = @JoinColumn(name = "course_id"))

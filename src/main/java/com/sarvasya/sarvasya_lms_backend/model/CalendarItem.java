@@ -52,6 +52,9 @@ public class CalendarItem {
     @Column(name = "color_code")
     private String colorCode;
 
+    @Column(name = "class_id")
+    private UUID classId;
+
     @Column(name = "created_by")
     private UUID createdBy;
 
@@ -80,13 +83,11 @@ public class CalendarItem {
                 throw new IllegalStateException("CalendarItem of type CLASS must have referenceType CLASS and a non-null referenceId");
             }
         } else if (type == CalendarItemType.EXAM) {
-            if (referenceType != ReferenceType.EXAM || referenceId == null) {
-                throw new IllegalStateException("CalendarItem of type EXAM must have referenceType EXAM and a non-null referenceId");
-            }
-        } else {
-            if (referenceType != null || referenceId != null) {
-                throw new IllegalStateException("CalendarItem of type " + type.name() + " must have null referenceType and referenceId");
+            if (referenceType != null && referenceType != ReferenceType.EXAM) {
+                throw new IllegalStateException("CalendarItem of type EXAM must have referenceType EXAM if set");
             }
         }
+        // ASSIGNMENT, EVENT, HOLIDAY: no reference validation needed
+        // classId is always optional — used for student filtering
     }
 }

@@ -154,6 +154,7 @@ public class UserController {
                 map.put("email", u.getEmail());
                 map.put("role", u.getRole().getValue());
                 map.put("degreeId", u.getDegreeId());
+                map.put("classId", u.getClassId());
                 return map;
             }).toList();
             return ResponseEntity.ok(result);
@@ -175,6 +176,44 @@ public class UserController {
             user.setDegreeId(degreeIdStr != null && !degreeIdStr.isBlank() ? UUID.fromString(degreeIdStr) : null);
             userRepository.save(user);
             return ResponseEntity.ok(Map.of("message", "Degree updated", "userId", id, "degreeId", String.valueOf(user.getDegreeId())));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @GetMapping("/{tenantName}/users/class/{classId}")
+    @PreAuthorize("hasAuthority('sarvasya-admin') or hasAuthority('admin') or hasAuthority('professor')")
+    public ResponseEntity<?> listUsersByClass(
+            @PathVariable String tenantName,
+            @PathVariable UUID classId) {
+        try {
+            List<User> users = userService.getUsersByClassId(classId);
+            List<Map<String, Object>> result = users.stream().map(u -> {
+                Map<String, Object> map = new java.util.LinkedHashMap<>();
+                map.put("id", u.getId());
+                map.put("name", u.getName());
+                map.put("email", u.getEmail());
+                map.put("role", u.getRole().getValue());
+                return map;
+            }).toList();
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{tenantName}/users/{id}/class")
+    @PreAuthorize("hasAuthority('sarvasya-admin') or hasAuthority('admin') or hasAuthority('professor')")
+    public ResponseEntity<?> assignClass(
+            @PathVariable String tenantName,
+            @PathVariable UUID id,
+            @RequestBody Map<String, String> body) {
+        try {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            String classIdStr = body.get("classId");
+            user.setClassId(classIdStr != null && !classIdStr.isBlank() ? UUID.fromString(classIdStr) : null);
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("message", "Class updated", "userId", id, "classId", String.valueOf(user.getClassId())));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

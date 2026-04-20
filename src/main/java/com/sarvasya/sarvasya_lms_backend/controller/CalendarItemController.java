@@ -28,6 +28,14 @@ public class CalendarItemController {
         return ResponseEntity.ok(service.findBetween(start, end));
     }
 
+    @GetMapping("/my")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin', 'professor', 'user')")
+    public ResponseEntity<List<CalendarItem>> getMyCalendarItems(
+            @PathVariable("tenantName") String tenantName,
+            @RequestParam(value = "classId", required = false) UUID classId) {
+        return ResponseEntity.ok(service.findForStudent(classId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin', 'professor')")
     public ResponseEntity<CalendarItem> create(

@@ -88,6 +88,9 @@ public class AuthController {
         extraClaims.put("id", user.getId().toString());
         extraClaims.put("name", user.getName());
         extraClaims.put("role", user.getRole().getValue());
+        if (user.getClassId() != null) {
+            extraClaims.put("classId", user.getClassId().toString());
+        }
 
         String jwt = jwtUtil.generateToken(userDetails, extraClaims);
         
