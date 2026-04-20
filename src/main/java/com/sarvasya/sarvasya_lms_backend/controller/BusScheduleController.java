@@ -21,7 +21,7 @@ public class BusScheduleController {
     private final BusScheduleService busScheduleService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<BusScheduleResponseDTO> createBusSchedule(@RequestBody BusScheduleCreateRequest request) {
         try {
             BusScheduleResponseDTO created = busScheduleService.createBusSchedule(request);
@@ -58,7 +58,7 @@ public class BusScheduleController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<BusScheduleResponseDTO> updateBusSchedule(@PathVariable UUID id,
             @RequestBody BusScheduleUpdateRequest request) {
         try {
@@ -70,7 +70,7 @@ public class BusScheduleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<?> deleteBusSchedule(@PathVariable UUID id) {
         try {
             busScheduleService.deleteBusSchedule(id);

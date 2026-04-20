@@ -90,12 +90,18 @@ These endpoints use the `{tenantName}` path variable to activate a specific scho
 ### 2.2 User Management (School Level)
 - **Create User:** `POST /api/{tenantName}/users`
 - **Permissions:** `sarvasya-admin`, `admin`, `professor` (Role-restricted)
+- **Rules:**
+    - `STUDENT`/`USER`: Must provide `classId`.
+    - `ADMIN`: Must provide `departmentId`.
+    - `PROFESSOR`: Linked to classes via join table (can leave `classId` null).
+    - `sarvasya-admin`: No class/department assignment required.
 - **Payload Example:**
 ```json
 {
   "name": "Pratham Sharma",
   "email": "pratham@harvard.com",
-  "role": "professor"
+  "role": "user",
+  "classId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2"
 }
 ```
 
@@ -441,29 +447,54 @@ Manages the unified calendar which handles classes, exams, assignments, events, 
 ```
 
 ### 5.2 Classes Management
-Manages minimalist class entities linked to calendar items. Used primarily for attendance mapping.
+Manages minimalist class entities linked to calendar items and courses.
 - **Get Classes:** `GET /api/{tenantName}/classes`
 - **Create Class:** `POST /api/{tenantName}/classes`
 - **Permissions:** `sarvasya-admin`, `admin`
 - **Payload Example:**
 ```json
 {
-  "subject": "Mathematics",
+  "courseId": "018f6c46-32a1-77b3-90ea-f2ab8790b1c1",
   "batchId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
   "teacherId": "018f6c43-1d4e-761a-b33c-f4ab9801d3b4"
 }
 ```
 
 ### 5.3 Exam Management
-Manages minimalist exam entities linked to calendar items. Used primarily for admit card generation and grading.
+Manages minimalist exam entities linked to calendar items and courses.
 - **Get Exams:** `GET /api/{tenantName}/exams`
 - **Create Exam:** `POST /api/{tenantName}/exams`
 - **Permissions:** `sarvasya-admin`, `admin`
 - **Payload Example:**
 ```json
 {
-  "subject": "Physics Midterm",
+  "courseId": "018f6c46-32a1-77b3-90ea-f2ab8790b1c1",
   "batchId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
   "totalMarks": 100
+}
+```
+
+### 5.4 Department Management
+- **URL:** `/api/{tenantName}/departments`
+- **Methods:** `GET`, `POST`, `DELETE`
+- **Permissions:** `sarvasya-admin`, `admin` (Create/Delete)
+- **Payload Example:**
+```json
+{
+  "name": "Computer Science & Engineering"
+}
+```
+
+### 5.5 Course Management
+- **URL:** `/api/{tenantName}/courses`
+- **Methods:** `GET`, `POST`, `DELETE`
+- **Filtering:** `GET /api/{tenantName}/courses/department/{departmentId}`
+- **Permissions:** `sarvasya-admin`, `admin` (Create/Delete)
+- **Payload Example:**
+```json
+{
+  "name": "Data Structures & Algorithms",
+  "departmentId": "018f6c45-1d4e-761a-b33c-f4ab9801d3b4",
+  "collegeId": "COL-12345"
 }
 ```

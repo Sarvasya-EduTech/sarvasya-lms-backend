@@ -1,7 +1,7 @@
 package com.sarvasya.sarvasya_lms_backend.controller;
 
-import com.sarvasya.sarvasya_lms_backend.model.Exam;
-import com.sarvasya.sarvasya_lms_backend.service.ExamService;
+import com.sarvasya.sarvasya_lms_backend.model.Department;
+import com.sarvasya.sarvasya_lms_backend.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,39 +11,39 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/{tenantName}/exams")
+@RequestMapping("/api/{tenantName}/departments")
 @RequiredArgsConstructor
-public class ExamController {
+public class DepartmentController {
 
-    private final ExamService service;
+    private final DepartmentService service;
 
     @GetMapping
-    public ResponseEntity<List<Exam>> getAll(@PathVariable("tenantName") String tenantName) {
+    public ResponseEntity<List<Department>> getAll(@PathVariable("tenantName") String tenantName) {
         return ResponseEntity.ok(service.findAll());
     }
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
-    public ResponseEntity<Exam> create(
-            @PathVariable("tenantName") String tenantName, 
-            @RequestBody Exam item) {
-        return ResponseEntity.ok(service.save(item));
+    public ResponseEntity<Department> create(
+            @PathVariable("tenantName") String tenantName,
+            @RequestBody Department department) {
+        return ResponseEntity.ok(service.save(department));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
-    public ResponseEntity<Exam> update(
+    public ResponseEntity<Department> update(
             @PathVariable("tenantName") String tenantName,
             @PathVariable("id") UUID id,
-            @RequestBody Exam item) {
-        item.setId(id);
-        return ResponseEntity.ok(service.save(item));
+            @RequestBody Department department) {
+        department.setId(id);
+        return ResponseEntity.ok(service.save(department));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<?> delete(
-            @PathVariable("tenantName") String tenantName, 
+            @PathVariable("tenantName") String tenantName,
             @PathVariable("id") UUID id) {
         service.delete(id);
         return ResponseEntity.ok().build();

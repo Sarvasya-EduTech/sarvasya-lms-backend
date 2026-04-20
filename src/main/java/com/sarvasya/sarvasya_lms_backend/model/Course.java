@@ -8,25 +8,25 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "exam")
+@Table(name = "course")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Exam {
+public class Course {
 
     @Id
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "course_id")
-    private UUID courseId;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(name = "batch_id")
-    private UUID batchId;
+    @Column(name = "college_id")
+    private String collegeId;
 
-    @Column(name = "total_marks")
-    private Integer totalMarks;
+    @Column(name = "department_id", nullable = false)
+    private UUID departmentId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -17,4 +17,8 @@ public class UserCreateRequest {
     private String role;
 
     private String tenantId;
+
+    private String classId;
+
+    private String departmentId;
 }

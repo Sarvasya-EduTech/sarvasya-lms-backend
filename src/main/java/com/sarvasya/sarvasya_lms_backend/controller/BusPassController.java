@@ -21,7 +21,7 @@ public class BusPassController {
     private final BusPassService busPassService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<BusPassResponseDTO> createBusPass(@RequestBody BusPassCreateRequest request) {
         try {
             BusPassResponseDTO created = busPassService.createBusPass(request);
@@ -65,7 +65,7 @@ public class BusPassController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<BusPassResponseDTO> updateBusPass(@PathVariable UUID id, @RequestBody BusPassUpdateRequest request) {
         try {
             BusPassResponseDTO updated = busPassService.updateBusPass(id, request);
@@ -77,7 +77,7 @@ public class BusPassController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<?> deleteBusPass(@PathVariable UUID id) {
         try {
             busPassService.deleteBusPass(id);

@@ -30,6 +30,16 @@ public class ClassesController {
         return ResponseEntity.ok(service.save(item));
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
+    public ResponseEntity<Classes> update(
+            @PathVariable("tenantName") String tenantName,
+            @PathVariable("id") UUID id,
+            @RequestBody Classes item) {
+        item.setId(id);
+        return ResponseEntity.ok(service.save(item));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<?> delete(

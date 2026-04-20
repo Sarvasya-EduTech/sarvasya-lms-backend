@@ -20,6 +20,7 @@ public class CalendarItemController {
     private final CalendarItemService service;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin', 'professor', 'user')")
     public ResponseEntity<List<CalendarItem>> getAll(
             @PathVariable("tenantName") String tenantName,
             @RequestParam(value = "start", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
@@ -32,6 +33,16 @@ public class CalendarItemController {
     public ResponseEntity<CalendarItem> create(
             @PathVariable("tenantName") String tenantName, 
             @RequestBody CalendarItem item) {
+        return ResponseEntity.ok(service.save(item));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin', 'professor')")
+    public ResponseEntity<CalendarItem> update(
+            @PathVariable("tenantName") String tenantName,
+            @PathVariable("id") UUID id,
+            @RequestBody CalendarItem item) {
+        item.setId(id);
         return ResponseEntity.ok(service.save(item));
     }
 

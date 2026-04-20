@@ -1,10 +1,12 @@
 package com.sarvasya.sarvasya_lms_backend.model;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -16,12 +18,17 @@ import java.util.UUID;
 public class Classes {
 
     @Id
-    @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(nullable = false)
-    private String subject;
+    @Column(name = "course_id")
+    private UUID courseId;
+
+    @ManyToMany
+    @JoinTable(name = "class_course",
+        joinColumns = @JoinColumn(name = "class_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id"))
+    private Set<Course> courses = new HashSet<>();
 
     @Column(name = "batch_id")
     private UUID batchId;
@@ -34,6 +41,9 @@ public class Classes {
 
     @PrePersist
     protected void onCreate() {
+        if (this.id == null) {
+            this.id = UuidCreator.getTimeOrderedEpoch();
+        }
         this.createdAt = LocalDateTime.now();
     }
 }
