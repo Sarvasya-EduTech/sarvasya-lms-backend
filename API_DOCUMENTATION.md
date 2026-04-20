@@ -90,12 +90,19 @@ These endpoints use the `{tenantName}` path variable to activate a specific scho
 ### 2.2 User Management (School Level)
 - **Create User:** `POST /api/{tenantName}/users`
 - **Permissions:** `sarvasya-admin`, `admin`, `professor` (Role-restricted)
+- **Rules:**
+    - `STUDENT`/`USER`: Must provide `classId`. Optionally provide `degreeId`.
+    - `ADMIN`: Must provide `departmentId`.
+    - `PROFESSOR`: Linked to classes via join table (can leave `classId` null).
+    - `sarvasya-admin`: No class/department assignment required.
 - **Payload Example:**
 ```json
 {
   "name": "Pratham Sharma",
   "email": "pratham@harvard.com",
-  "role": "professor"
+  "role": "user",
+  "classId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
+  "degreeId": "018f6c50-1a2b-7333-b44c-d5e6f7890abc"
 }
 ```
 
@@ -401,3 +408,134 @@ The system enforces strict role-based quotas. Returns `400 Bad Request` when lim
   "message": "Role Creation Quota limit exceeded. Please purchase more quota limit for it."
 }
 ```
+
+---
+
+## 5. Scheduling & Calendar Operations
+These endpoints are tenant-specific and handle all calendar events, classes, and exams.
+
+### 5.1 Calendar Management
+Manages the unified calendar which handles classes, exams, assignments, events, and holidays.
+- **Get Calendar Items:** `GET /api/{tenantName}/calendar?start={startDate}&end={endDate}`
+- **Create Calendar Item:** `POST /api/{tenantName}/calendar`
+- **Permissions:** 
+    - `GET`: All authenticated roles
+    - `POST`: `sarvasya-admin`, `admin`, `professor`
+- **Payload Example (Event):**
+```json
+{
+  "title": "Annual Sports Meet",
+  "description": "Inter-school sports competition.",
+  "type": "EVENT",
+  "startDateTime": "2026-10-15T09:00:00",
+  "endDateTime": "2026-10-17T17:00:00",
+  "allDay": true,
+  "colorCode": "#FF5722"
+}
+```
+- **Payload Example (Class - requires referenceId):**
+```json
+{
+  "title": "Mathematics 101",
+  "type": "CLASS",
+  "startDateTime": "2026-05-10T10:00:00",
+  "endDateTime": "2026-05-10T11:00:00",
+  "allDay": false,
+  "referenceId": "018f6c44-32a1-77b3-90ea-f2ab8790b1c1",
+  "referenceType": "CLASS",
+  "colorCode": "#2196F3"
+}
+```
+
+### 5.2 Classes Management
+Manages minimalist class entities linked to calendar items and courses.
+- **Get Classes:** `GET /api/{tenantName}/classes`
+- **Create Class:** `POST /api/{tenantName}/classes`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "courseId": "018f6c46-32a1-77b3-90ea-f2ab8790b1c1",
+  "batchId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
+  "teacherId": "018f6c43-1d4e-761a-b33c-f4ab9801d3b4"
+}
+```
+
+### 5.3 Exam Management
+Manages minimalist exam entities linked to calendar items and courses.
+- **Get Exams:** `GET /api/{tenantName}/exams`
+- **Create Exam:** `POST /api/{tenantName}/exams`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "courseId": "018f6c46-32a1-77b3-90ea-f2ab8790b1c1",
+  "batchId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
+  "totalMarks": 100
+}
+```
+
+### 5.4 Department Management
+- **URL:** `/api/{tenantName}/departments`
+- **Methods:** `GET`, `POST`, `DELETE`
+- **Permissions:** `sarvasya-admin`, `admin` (Create/Delete)
+- **Payload Example:**
+```json
+{
+  "name": "Computer Science & Engineering"
+}
+```
+
+### 5.5 Course Management
+- **URL:** `/api/{tenantName}/courses`
+- **Methods:** `GET`, `POST`, `DELETE`
+- **Filtering:** `GET /api/{tenantName}/courses/department/{departmentId}`
+- **Permissions:** `sarvasya-admin`, `admin` (Create/Delete)
+- **Payload Example:**
+```json
+{
+  "name": "Data Structures & Algorithms",
+  "departmentId": "018f6c45-1d4e-761a-b33c-f4ab9801d3b4",
+  "collegeId": "COL-12345"
+}
+```
+
+### 5.6 Degree Management
+Manages degree programs (e.g., B.Tech, M.Sc) with their duration and semester structure.
+
+#### Get All Degrees
+- **URL:** `/api/{tenantName}/degrees`
+- **Method:** `GET`
+- **Permissions:** All authenticated users
+
+#### Create Degree
+- **URL:** `/api/{tenantName}/degrees`
+- **Method:** `POST`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "degreeName": "B.Tech Computer Science",
+  "numberOfYears": 4,
+  "numberOfSemesters": 8
+}
+```
+
+#### Update Degree
+- **URL:** `/api/{tenantName}/degrees/{id}`
+- **Method:** `PUT`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "degreeName": "B.Tech Computer Science & Engineering",
+  "numberOfYears": 4,
+  "numberOfSemesters": 8
+}
+```
+
+#### Delete Degree
+- **URL:** `/api/{tenantName}/degrees/{id}`
+- **Method:** `DELETE`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Note:** Deleting a degree sets `degree_id` to `NULL` on all associated student records (`ON DELETE SET NULL`).

@@ -21,7 +21,7 @@ public class BusController {
     private final BusService busService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<Bus> createBus(@RequestBody Bus bus) {
         logger.info("Creating bus: {}", bus);
         try {
@@ -53,7 +53,7 @@ public class BusController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<Bus> updateBus(@PathVariable UUID id, @RequestBody Bus busDetails) {
         try {
             Bus updatedBus = busService.updateBus(id, busDetails);
@@ -64,7 +64,7 @@ public class BusController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
     public ResponseEntity<?> deleteBus(@PathVariable UUID id) {
         try {
             busService.deleteBus(id);

@@ -3,7 +3,6 @@ package com.sarvasya.sarvasya_lms_backend.controller;
 import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleCreateRequest;
 import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleResponseDTO;
 import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleUpdateRequest;
-import com.sarvasya.sarvasya_lms_backend.model.BusSchedule;
 import com.sarvasya.sarvasya_lms_backend.service.BusScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

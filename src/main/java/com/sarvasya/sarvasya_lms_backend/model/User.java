@@ -59,4 +59,12 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "class_id")
+    private UUID classId;
+
+    @Column(name = "department_id")
+    private UUID departmentId;
+    @Column(name = "degree_id")
+    private UUID degreeId;
 }
