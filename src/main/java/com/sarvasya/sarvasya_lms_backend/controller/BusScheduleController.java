@@ -3,7 +3,6 @@ package com.sarvasya.sarvasya_lms_backend.controller;
 import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleCreateRequest;
 import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleResponseDTO;
 import com.sarvasya.sarvasya_lms_backend.dto.BusScheduleUpdateRequest;
-import com.sarvasya.sarvasya_lms_backend.model.BusSchedule;
 import com.sarvasya.sarvasya_lms_backend.service.BusScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class BusScheduleController {
     private final BusScheduleService busScheduleService;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<BusScheduleResponseDTO> createBusSchedule(@RequestBody BusScheduleCreateRequest request) {
         try {
             BusScheduleResponseDTO created = busScheduleService.createBusSchedule(request);
@@ -58,7 +57,7 @@ public class BusScheduleController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<BusScheduleResponseDTO> updateBusSchedule(@PathVariable UUID id,
             @RequestBody BusScheduleUpdateRequest request) {
         try {
@@ -70,7 +69,7 @@ public class BusScheduleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('sarvasya-admin', 'admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> deleteBusSchedule(@PathVariable UUID id) {
         try {
             busScheduleService.deleteBusSchedule(id);

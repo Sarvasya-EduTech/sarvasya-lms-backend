@@ -65,4 +65,6 @@ public class User {
 
     @Column(name = "department_id")
     private UUID departmentId;
+    @Column(name = "degree_id")
+    private UUID degreeId;
 }

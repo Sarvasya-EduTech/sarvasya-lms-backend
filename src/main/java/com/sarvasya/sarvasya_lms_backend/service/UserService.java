@@ -98,6 +98,7 @@ public class UserService {
                     .isActive(true)
                     .classId(req.getClassId() != null && !req.getClassId().isEmpty() ? UUID.fromString(req.getClassId()) : null)
                     .departmentId(req.getDepartmentId() != null && !req.getDepartmentId().isEmpty() ? UUID.fromString(req.getDepartmentId()) : null)
+                    .degreeId(req.getDegreeId() != null && !req.getDegreeId().isEmpty() ? UUID.fromString(req.getDegreeId()) : null)
                     .build();
 
             usersToSave.add(user);
@@ -166,6 +167,7 @@ public class UserService {
                 .isActive(true)
                 .classId(req.getClassId() != null && !req.getClassId().isEmpty() ? UUID.fromString(req.getClassId()) : null)
                 .departmentId(req.getDepartmentId() != null && !req.getDepartmentId().isEmpty() ? UUID.fromString(req.getDepartmentId()) : null)
+                .degreeId(req.getDegreeId() != null && !req.getDegreeId().isEmpty() ? UUID.fromString(req.getDegreeId()) : null)
                 .build();
 
         userRepository.saveAndFlush(user);

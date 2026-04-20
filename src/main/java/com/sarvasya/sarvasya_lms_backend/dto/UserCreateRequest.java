@@ -21,4 +21,6 @@ public class UserCreateRequest {
     private String classId;
 
     private String departmentId;
+
+    private String degreeId;
 }

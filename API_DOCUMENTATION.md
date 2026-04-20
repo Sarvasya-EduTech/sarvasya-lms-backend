@@ -91,7 +91,7 @@ These endpoints use the `{tenantName}` path variable to activate a specific scho
 - **Create User:** `POST /api/{tenantName}/users`
 - **Permissions:** `sarvasya-admin`, `admin`, `professor` (Role-restricted)
 - **Rules:**
-    - `STUDENT`/`USER`: Must provide `classId`.
+    - `STUDENT`/`USER`: Must provide `classId`. Optionally provide `degreeId`.
     - `ADMIN`: Must provide `departmentId`.
     - `PROFESSOR`: Linked to classes via join table (can leave `classId` null).
     - `sarvasya-admin`: No class/department assignment required.
@@ -101,7 +101,8 @@ These endpoints use the `{tenantName}` path variable to activate a specific scho
   "name": "Pratham Sharma",
   "email": "pratham@harvard.com",
   "role": "user",
-  "classId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2"
+  "classId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
+  "degreeId": "018f6c50-1a2b-7333-b44c-d5e6f7890abc"
 }
 ```
 
@@ -498,3 +499,43 @@ Manages minimalist exam entities linked to calendar items and courses.
   "collegeId": "COL-12345"
 }
 ```
+
+### 5.6 Degree Management
+Manages degree programs (e.g., B.Tech, M.Sc) with their duration and semester structure.
+
+#### Get All Degrees
+- **URL:** `/api/{tenantName}/degrees`
+- **Method:** `GET`
+- **Permissions:** All authenticated users
+
+#### Create Degree
+- **URL:** `/api/{tenantName}/degrees`
+- **Method:** `POST`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "degreeName": "B.Tech Computer Science",
+  "numberOfYears": 4,
+  "numberOfSemesters": 8
+}
+```
+
+#### Update Degree
+- **URL:** `/api/{tenantName}/degrees/{id}`
+- **Method:** `PUT`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Payload Example:**
+```json
+{
+  "degreeName": "B.Tech Computer Science & Engineering",
+  "numberOfYears": 4,
+  "numberOfSemesters": 8
+}
+```
+
+#### Delete Degree
+- **URL:** `/api/{tenantName}/degrees/{id}`
+- **Method:** `DELETE`
+- **Permissions:** `sarvasya-admin`, `admin`
+- **Note:** Deleting a degree sets `degree_id` to `NULL` on all associated student records (`ON DELETE SET NULL`).
