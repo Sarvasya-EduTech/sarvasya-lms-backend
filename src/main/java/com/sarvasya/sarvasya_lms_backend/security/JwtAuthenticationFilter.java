@@ -31,10 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        Claims claims = null;
-
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
+        } else {
+            jwt = request.getParameter("token");
+        }
+
+        Claims claims = null;
+        if (jwt != null) {
             try {
                 claims = jwtUtil.extractAllClaims(jwt);
                 username = claims.getSubject();

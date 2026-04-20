@@ -25,4 +25,8 @@ public class ClassesService {
     public void delete(UUID id) {
         repository.deleteById(id);
     }
+
+    public Classes findById(UUID id) {
+        return repository.findById(id).orElse(null);
+    }
 }

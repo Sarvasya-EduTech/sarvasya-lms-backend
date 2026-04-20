@@ -354,4 +354,8 @@ public class UserService {
     public List<User> getUsersByClassId(UUID classId) {
         return userRepository.findByClassId(classId);
     }
+
+    public User findById(UUID id) {
+        return userRepository.findById(id).orElse(null);
+    }
 }
