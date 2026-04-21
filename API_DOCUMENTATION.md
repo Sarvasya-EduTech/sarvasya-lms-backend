@@ -539,3 +539,248 @@ Manages degree programs (e.g., B.Tech, M.Sc) with their duration and semester st
 - **Method:** `DELETE`
 - **Permissions:** `sarvasya-admin`, `admin`
 - **Note:** Deleting a degree sets `degree_id` to `NULL` on all associated student records (`ON DELETE SET NULL`).
+
+---
+
+## 6. Global Course Management (Sarvasya LMS APIs)
+These endpoints manage the core LMS content (courses, modules, exams, questions) and student records (enrollments, attempts, payments). All data is stored centrally in the global `tenant` schema.
+
+All endpoints support standard REST CRUD operations (`GET`, `POST`, `PUT`, `DELETE`).
+
+### 6.1 Content Management (Global Path)
+These APIs do not require a tenant context as they manage shared, global content.
+
+**Base Path:** `/api/sarvasya/{resource}`
+
+- **Courses**: `/api/sarvasya/courses`
+- **Modules**: `/api/sarvasya/modules`
+- **Lessons**: `/api/sarvasya/lessons`
+- **Study Materials**: `/api/sarvasya/studymaterials`
+- **Quizzes**: `/api/sarvasya/quizs`
+- **Exams**: `/api/sarvasya/exams`
+- **Questions**: `/api/sarvasya/questions`
+- **Options**: `/api/sarvasya/options`
+- **Quiz Questions Mapping**: `/api/sarvasya/quizquestions`
+- **Exam Questions Mapping**: `/api/sarvasya/examquestions`
+
+### 6.2 Student Records (Tenant-Scoped Path)
+Because students belong to specific tenants, these APIs require `{tenantid}` in the path to establish the tenant context. However, the data is still persisted centrally in the global `tenant` schema.
+
+**Base Path:** `/api/sarvasya/{tenantid}/{resource}`
+
+- **Assessment Attempts**: `/api/sarvasya/{tenantid}/attempts`
+- **Student Answers**: `/api/sarvasya/{tenantid}/studentanswers`
+- **Enrollments**: `/api/sarvasya/{tenantid}/enrollments`
+- **Payments**: `/api/sarvasya/{tenantid}/payments`
+- **Invoices**: `/api/sarvasya/{tenantid}/invoices`
+- **Certificates**: `/api/sarvasya/{tenantid}/certificates`
+
+### Example: Course Management
+- **Get All Courses**: `GET /api/sarvasya/courses`
+- **Get Course by ID**: `GET /api/sarvasya/courses/{id}`
+- **Create Course**: `POST /api/sarvasya/courses`
+- **Update Course**: `PUT /api/sarvasya/courses/{id}`
+- **Delete Course**: `DELETE /api/sarvasya/courses/{id}`
+
+**Payload Example (Course Create/Update):**
+```json
+{
+  "title": "Advanced Java Programming",
+  "description": "Deep dive into multithreading, JVM performance, and memory management.",
+  "price": 199.99,
+  "courseCode": "CS-JAVA-400",
+  "isActive": true
+}
+```
+
+### Example: Enrollment
+- **Create Enrollment**: `POST /api/sarvasya/{tenantid}/enrollments`
+
+**Payload Example (Enrollment):**
+```json
+{
+  "studentId": "018f6c42-2b8e-7111-a83d-e21b7643a5f2",
+  "courseId": "uuid-of-course",
+  "enrollmentNumber": "ENR-2024-001",
+  "sequenceNumber": 1,
+  "isPaid": true
+}
+```
+
+### Example: Module Management
+- **Create Module**: `POST /api/sarvasya/modules`
+
+**Payload Example:**
+```json
+{
+  "courseId": "uuid-of-course",
+  "title": "Getting Started with Java",
+  "orderIndex": 1
+}
+```
+
+### Example: Lesson Management
+- **Create Lesson**: `POST /api/sarvasya/lessons`
+
+**Payload Example:**
+```json
+{
+  "moduleId": "uuid-of-module",
+  "title": "Variables and Data Types",
+  "videoUrl": "https://video.example.com/java-variables.mp4",
+  "orderIndex": 1,
+  "isPreview": true
+}
+```
+
+### Example: Study Material Management
+- **Create Study Material**: `POST /api/sarvasya/studymaterials`
+
+**Payload Example:**
+```json
+{
+  "moduleId": "uuid-of-module",
+  "title": "Java Cheat Sheet",
+  "content": "### Java Basics\n...",
+  "fileUrl": "https://files.example.com/cheat-sheet.pdf",
+  "type": "FILE",
+  "orderIndex": 2,
+  "isDownloadable": true
+}
+```
+
+### Example: Quiz Management
+- **Create Quiz**: `POST /api/sarvasya/quizs`
+
+**Payload Example:**
+```json
+{
+  "moduleId": "uuid-of-module",
+  "passingScore": 75
+}
+```
+
+### Example: Exam Management
+- **Create Exam**: `POST /api/sarvasya/exams`
+
+**Payload Example:**
+```json
+{
+  "courseId": "uuid-of-course",
+  "passingScore": 80
+}
+```
+
+### Example: Question Management
+- **Create Question**: `POST /api/sarvasya/questions`
+
+**Payload Example:**
+```json
+{
+  "type": "MCQ",
+  "questionText": "What is the size of int in Java?",
+  "explanation": "In Java, int is a 32-bit signed integer.",
+  "marks": 2.5,
+  "negativeMarks": 0.5,
+  "topic": "Data Types",
+  "difficulty": "EASY"
+}
+```
+
+### Example: Option Management
+- **Create Option**: `POST /api/sarvasya/options`
+
+**Payload Example:**
+```json
+{
+  "questionId": "uuid-of-question",
+  "text": "32-bit",
+  "isCorrect": true
+}
+```
+
+### Example: Quiz / Exam Question Mapping
+- **Create Quiz Question**: `POST /api/sarvasya/quizquestions`
+
+**Payload Example:**
+```json
+{
+  "quizId": "uuid-of-quiz",
+  "questionId": "uuid-of-question",
+  "orderIndex": 1
+}
+```
+
+### Example: Attempt Management
+- **Create Attempt**: `POST /api/sarvasya/{tenantid}/attempts`
+
+**Payload Example:**
+```json
+{
+  "studentId": "uuid-of-student",
+  "assessmentId": "uuid-of-quiz-or-exam",
+  "type": "QUIZ",
+  "score": 85.0,
+  "maxScore": 100.0,
+  "percentage": 85.0,
+  "isPassed": true,
+  "totalQuestions": 20,
+  "correctAnswers": 17,
+  "submittedAt": "2026-04-21T10:00:00"
+}
+```
+
+### Example: Student Answer
+- **Create Student Answer**: `POST /api/sarvasya/{tenantid}/studentanswers`
+
+**Payload Example:**
+```json
+{
+  "attemptId": "uuid-of-attempt",
+  "questionId": "uuid-of-question",
+  "selectedOptionIds": "uuid-of-option-1,uuid-of-option-2",
+  "isCorrect": true,
+  "marksAwarded": 2.5
+}
+```
+
+### Example: Payment Management
+- **Create Payment**: `POST /api/sarvasya/{tenantid}/payments`
+
+**Payload Example:**
+```json
+{
+  "studentId": "uuid-of-student",
+  "courseId": "uuid-of-course",
+  "amount": 199.99,
+  "paymentGateway": "STRIPE",
+  "paymentId": "pi_1234567890",
+  "status": "SUCCESS",
+  "paidAt": "2026-04-21T10:05:00"
+}
+```
+
+### Example: Invoice Management
+- **Create Invoice**: `POST /api/sarvasya/{tenantid}/invoices`
+
+**Payload Example:**
+```json
+{
+  "paymentId": "uuid-of-payment",
+  "invoiceNumber": "INV-2026-001",
+  "invoiceUrl": "https://invoices.example.com/INV-2026-001.pdf"
+}
+```
+
+### Example: Certificate Management
+- **Create Certificate**: `POST /api/sarvasya/{tenantid}/certificates`
+
+**Payload Example:**
+```json
+{
+  "studentId": "uuid-of-student",
+  "courseId": "uuid-of-course",
+  "certificateUrl": "https://certs.example.com/CERT-123.pdf",
+  "issuedAt": "2026-04-21T10:10:00"
+}
+```
