@@ -79,8 +79,8 @@ public class CalendarItem {
 
     private void validateReferences() {
         if (type == CalendarItemType.CLASS) {
-            if (referenceType != ReferenceType.CLASS || referenceId == null) {
-                throw new IllegalStateException("CalendarItem of type CLASS must have referenceType CLASS and a non-null referenceId");
+            if (referenceType != null && referenceType != ReferenceType.CLASS && referenceType != ReferenceType.COURSE) {
+                throw new IllegalStateException("CalendarItem of type CLASS must have referenceType CLASS, COURSE or null");
             }
         } else if (type == CalendarItemType.EXAM) {
             if (referenceType != null && referenceType != ReferenceType.EXAM) {
