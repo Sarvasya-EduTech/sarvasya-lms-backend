@@ -32,7 +32,9 @@ public class SarvasyaModuleService {
     @Transactional
     public SarvasyaModule update(UUID id, SarvasyaModule updated) {
         return repository.findById(id).map(existing -> {
-            // TODO: Map specific fields from updated to existing here if needed
+            existing.setTitle(updated.getTitle());
+            existing.setOrderIndex(updated.getOrderIndex());
+            existing.setCourseId(updated.getCourseId());
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("SarvasyaModule not found"));
     }

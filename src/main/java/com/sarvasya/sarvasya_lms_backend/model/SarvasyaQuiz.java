@@ -24,7 +24,17 @@ public class SarvasyaQuiz {
     private UUID moduleId;
 
     @Column(name = "passing_score")
-    private Integer passingScore;
+    @Builder.Default
+    private Integer passingScore = 80;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

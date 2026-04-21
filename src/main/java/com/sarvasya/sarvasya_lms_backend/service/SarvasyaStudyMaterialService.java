@@ -32,7 +32,13 @@ public class SarvasyaStudyMaterialService {
     @Transactional
     public SarvasyaStudyMaterial update(UUID id, SarvasyaStudyMaterial updated) {
         return repository.findById(id).map(existing -> {
-            // TODO: Map specific fields from updated to existing here if needed
+            existing.setTitle(updated.getTitle());
+            existing.setContent(updated.getContent());
+            existing.setFileUrl(updated.getFileUrl());
+            existing.setType(updated.getType());
+            existing.setOrderIndex(updated.getOrderIndex());
+            existing.setIsDownloadable(updated.getIsDownloadable());
+            existing.setModuleId(updated.getModuleId());
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("SarvasyaStudyMaterial not found"));
     }

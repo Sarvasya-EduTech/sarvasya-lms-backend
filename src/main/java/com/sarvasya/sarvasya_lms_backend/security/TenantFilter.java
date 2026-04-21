@@ -36,11 +36,18 @@ public class TenantFilter extends OncePerRequestFilter {
             }
         } else if (path.startsWith("/api/")) {
             String[] parts = path.split("/");
-            if (parts.length >= 3) {
+            if (parts.length == 3) {
+                // Global request: /api/calendar, /api/users
+                TenantContext.setTenantId("tenant");
+            } else if (parts.length >= 4) {
                 String tenantName = parts[2];
-                if (!tenantName.equals("v1") && !tenantName.equals("auth")) {
+                if (!tenantName.equals("v1") && !tenantName.equals("auth") && !tenantName.equals("sarvasya")) {
                     TenantContext.setTenantId(tenantName);
+                } else {
+                    TenantContext.setTenantId("tenant");
                 }
+            } else {
+                TenantContext.setTenantId("tenant");
             }
         }
 

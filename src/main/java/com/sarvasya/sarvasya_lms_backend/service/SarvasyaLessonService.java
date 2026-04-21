@@ -32,7 +32,11 @@ public class SarvasyaLessonService {
     @Transactional
     public SarvasyaLesson update(UUID id, SarvasyaLesson updated) {
         return repository.findById(id).map(existing -> {
-            // TODO: Map specific fields from updated to existing here if needed
+            existing.setTitle(updated.getTitle());
+            existing.setVideoUrl(updated.getVideoUrl());
+            existing.setOrderIndex(updated.getOrderIndex());
+            existing.setIsPreview(updated.getIsPreview());
+            existing.setModuleId(updated.getModuleId());
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("SarvasyaLesson not found"));
     }

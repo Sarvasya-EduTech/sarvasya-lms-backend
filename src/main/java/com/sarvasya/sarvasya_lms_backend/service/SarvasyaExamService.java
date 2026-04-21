@@ -32,7 +32,11 @@ public class SarvasyaExamService {
     @Transactional
     public SarvasyaExam update(UUID id, SarvasyaExam updated) {
         return repository.findById(id).map(existing -> {
-            // TODO: Map specific fields from updated to existing here if needed
+            existing.setTitle(updated.getTitle());
+            existing.setDescription(updated.getDescription());
+            existing.setDurationMinutes(updated.getDurationMinutes());
+            existing.setPassingScore(updated.getPassingScore());
+            existing.setCourseId(updated.getCourseId());
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("SarvasyaExam not found"));
     }

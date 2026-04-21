@@ -49,10 +49,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (username != null && claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String tokenTenant = (String) claims.get("tenantId");
-
             if (tokenTenant != null) {
-                // Set tenant from token - this will be used for the entire request
-                TenantContext.setTenantId(tokenTenant);
+                String currentTenant = TenantContext.getTenantId();
+                // Only set from token if not already set by URL, 
+                // or if we are currently in the global 'tenant' context and the token is also 'tenant'
+                if (currentTenant == null || currentTenant.equals("tenant")) {
+                    TenantContext.setTenantId(tokenTenant);
+                }
             }
 
             UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);

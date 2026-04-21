@@ -1,24 +1,20 @@
 package com.sarvasya.sarvasya_lms_backend.controller;
 
-import com.sarvasya.sarvasya_lms_backend.repository.TenantConfigRepository;
 import com.sarvasya.sarvasya_lms_backend.model.TenantConfig;
-import com.sarvasya.sarvasya_lms_backend.repository.UserRepository;
+import com.sarvasya.sarvasya_lms_backend.repository.GlobalUserRepository;
+import com.sarvasya.sarvasya_lms_backend.repository.TenantConfigRepository;
 import com.sarvasya.sarvasya_lms_backend.security.JwtUtil;
-import com.sarvasya.sarvasya_lms_backend.security.TenantContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/tenants")
@@ -26,116 +22,83 @@ import java.util.stream.Collectors;
 public class TenantController {
 
     private final TenantConfigRepository tenantConfigRepository;
-    private final UserRepository userRepository;
+    private final GlobalUserRepository globalUserRepository;
     private final JwtUtil jwtUtil;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<String>> getAllTenants() {
-        List<String> tenantIds = tenantConfigRepository.findAll()
-                .stream()
-                .map(TenantConfig::getTenantId)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(tenantIds);
+    public ResponseEntity<List<TenantConfig>> getAllTenants() {
+        return ResponseEntity.ok(tenantConfigRepository.findAll());
     }
 
     @GetMapping("/{tenantId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<TenantConfig> getTenantConfig(
-            @org.springframework.web.bind.annotation.PathVariable String tenantId) {
+    public ResponseEntity<TenantConfig> getTenantConfig(@PathVariable String tenantId) {
         return tenantConfigRepository.findById(tenantId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @org.springframework.web.bind.annotation.PutMapping
+    @PutMapping
     @PreAuthorize("hasAuthority('tenant-manager')")
-    public ResponseEntity<?> updateTenantConfig(
-            @org.springframework.web.bind.annotation.RequestBody TenantConfig config) {
+    public ResponseEntity<?> updateTenantConfig(@RequestBody TenantConfig config) {
         String tenantId = config.getTenantId();
         if (tenantId == null || tenantId.isBlank()) {
-            return ResponseEntity.badRequest().body("Error: tenantId is required in the request body.");
+            return ResponseEntity.badRequest().body(Map.of("error", "tenantId is required in the request body."));
         }
         if (!tenantConfigRepository.existsById(tenantId)) {
             return ResponseEntity.notFound().build();
         }
         tenantConfigRepository.save(config);
-        return ResponseEntity.ok("Tenant configuration updated successfully.");
+        return ResponseEntity.ok(Map.of("message", "Tenant configuration updated successfully."));
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/{tenantId}/impersonate")
+    @PostMapping("/{tenantId}/impersonate")
     @PreAuthorize("hasAuthority('tenant-manager')")
-    public ResponseEntity<?> impersonateTenant(@org.springframework.web.bind.annotation.PathVariable String tenantId) {
+    public ResponseEntity<?> impersonateTenant(@PathVariable String tenantId) {
         try {
             // Get current authenticated user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(401).body("Error: Not authenticated");
+                return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
             }
 
-            // Extract the email from the principal (UserDetails)
+            // Extract the email from the principal
             Object principal = authentication.getPrincipal();
-            String currentUserEmail = null;
-
-            if (principal instanceof UserDetails) {
-                currentUserEmail = ((UserDetails) principal).getUsername();
-            } else {
-                currentUserEmail = authentication.getName();
-            }
+            String currentUserEmail = (principal instanceof UserDetails) 
+                    ? ((UserDetails) principal).getUsername() 
+                    : authentication.getName();
 
             if (currentUserEmail == null || currentUserEmail.isBlank()) {
-                return ResponseEntity.status(401).body("Error: Could not extract user email from authentication");
+                return ResponseEntity.status(401).body(Map.of("error", "Could not extract user email"));
             }
 
-            // tenant-manager users exist in the "tenant" schema, not in the target tenant
-            // schema
-            // Save current context and switch to "tenant" schema to find the user
-            String originalContext = TenantContext.getTenantId();
-            try {
-                TenantContext.setTenantId("tenant");
+            // Global users exist in the "tenant" schema. GlobalUserRepository handles this automatically.
+            var currentUser = globalUserRepository.findByEmail(currentUserEmail).orElse(null);
 
-                var currentUser = userRepository.findByEmail(currentUserEmail)
-                        .orElse(null);
-
-                if (currentUser == null) {
-                    return ResponseEntity.status(401).body("Error: User not found for email: " + currentUserEmail);
-                }
-
-                // Restore original context
-                if (originalContext != null) {
-                    TenantContext.setTenantId(originalContext);
-                } else {
-                    TenantContext.clear();
-                }
-
-                // Validate tenant exists
-                if (!tenantConfigRepository.existsById(tenantId)) {
-                    return ResponseEntity.status(404).body("Error: Tenant not found");
-                }
-
-                // Generate impersonation token with tenant context and original role
-                String impersonationToken = jwtUtil.generateImpersonationToken(
-                        currentUserEmail,
-                        tenantId,
-                        currentUser.getRole().getValue());
-
-                // Return token in the format expected by Dart client
-                Map<String, Object> response = new HashMap<>();
-                response.put("token", impersonationToken);
-                response.put("impersonationToken", impersonationToken);
-                response.put("tenantId", tenantId);
-
-                return ResponseEntity.ok(response);
-            } finally {
-                // Ensure context is properly restored
-                if (originalContext != null) {
-                    TenantContext.setTenantId(originalContext);
-                } else {
-                    TenantContext.clear();
-                }
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "User not found: " + currentUserEmail));
             }
+
+            // Validate tenant exists
+            if (!tenantConfigRepository.existsById(tenantId)) {
+                return ResponseEntity.status(404).body(Map.of("error", "Tenant not found"));
+            }
+
+            // Generate impersonation token with target tenant context
+            String impersonationToken = jwtUtil.generateImpersonationToken(
+                    currentUserEmail,
+                    tenantId,
+                    currentUser.getRole().getValue());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", impersonationToken);
+            response.put("impersonationToken", impersonationToken);
+            response.put("tenantId", tenantId);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 }

@@ -1,3 +1,32 @@
+-- V1__Initial_Schema.sql
+-- Consolidated schema for the shared 'tenant' schema
+
+CREATE SCHEMA IF NOT EXISTS tenant;
+
+-- 1. Configuration and Global Users
+CREATE TABLE IF NOT EXISTS tenant.tenant_config (
+    tenant_id VARCHAR(255) PRIMARY KEY,
+    features JSONB,
+    limits JSONB,
+    license JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tenant.users (
+    id UUID NOT NULL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    requires_password_change BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP
+);
+
+
+
+-- 2. LMS Core Tables
 CREATE TABLE IF NOT EXISTS tenant.sarvasya_course (
     id UUID PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -42,6 +71,9 @@ CREATE TABLE IF NOT EXISTS tenant.sarvasya_study_material (
 CREATE TABLE IF NOT EXISTS tenant.sarvasya_quiz (
     id UUID PRIMARY KEY,
     module_id UUID REFERENCES tenant.sarvasya_module(id) ON DELETE CASCADE,
+    title VARCHAR(255),
+    description TEXT,
+    duration_minutes INTEGER,
     passing_score INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -49,6 +81,9 @@ CREATE TABLE IF NOT EXISTS tenant.sarvasya_quiz (
 CREATE TABLE IF NOT EXISTS tenant.sarvasya_exam (
     id UUID PRIMARY KEY,
     course_id UUID REFERENCES tenant.sarvasya_course(id) ON DELETE CASCADE,
+    title VARCHAR(255),
+    description TEXT,
+    duration_minutes INTEGER,
     passing_score INT DEFAULT 80,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

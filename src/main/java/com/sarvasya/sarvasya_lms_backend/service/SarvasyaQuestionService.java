@@ -32,7 +32,17 @@ public class SarvasyaQuestionService {
     @Transactional
     public SarvasyaQuestion update(UUID id, SarvasyaQuestion updated) {
         return repository.findById(id).map(existing -> {
-            // TODO: Map specific fields from updated to existing here if needed
+            existing.setType(updated.getType());
+            existing.setQuestionText(updated.getQuestionText());
+            existing.setExplanation(updated.getExplanation());
+            existing.setMarks(updated.getMarks());
+            existing.setNegativeMarks(updated.getNegativeMarks());
+            existing.setNatAnswer(updated.getNatAnswer());
+            existing.setNatMinRange(updated.getNatMinRange());
+            existing.setNatMaxRange(updated.getNatMaxRange());
+            existing.setIsRangeBased(updated.getIsRangeBased());
+            existing.setTopic(updated.getTopic());
+            existing.setDifficulty(updated.getDifficulty());
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("SarvasyaQuestion not found"));
     }
