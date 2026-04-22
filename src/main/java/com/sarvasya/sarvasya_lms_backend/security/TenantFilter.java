@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class TenantFilter extends OncePerRequestFilter {
@@ -40,9 +41,21 @@ public class TenantFilter extends OncePerRequestFilter {
                 // Global request: /api/calendar, /api/users
                 TenantContext.setTenantId("tenant");
             } else if (parts.length >= 4) {
-                String tenantName = parts[2];
-                if (!tenantName.equals("v1") && !tenantName.equals("auth") && !tenantName.equals("sarvasya")) {
-                    TenantContext.setTenantId(tenantName);
+                String segment2 = parts[2]; // can be 'v1', 'auth', 'sarvasya', or {tenantId}
+                if (segment2.equals("sarvasya") && parts.length >= 5) {
+                    // Check if it's /api/sarvasya/{tenantId}/...
+                    String possibleTenant = parts[3];
+                    // List of global sarvasya sub-paths (if any, currently we assume /api/sarvasya/{resource} is global)
+                    // If parts[3] is a resource name (courses, modules, etc.), it's global.
+                    // If it's a tenant name, it's tenant-scoped.
+                    List<String> globalResources = List.of("courses", "modules", "lessons", "studymaterials", "quizs", "exams", "questions", "options", "quizquestions", "examquestions", "upload");
+                    if (globalResources.contains(possibleTenant)) {
+                        TenantContext.setTenantId("tenant");
+                    } else {
+                        TenantContext.setTenantId(possibleTenant);
+                    }
+                } else if (!segment2.equals("v1") && !segment2.equals("auth") && !segment2.equals("sarvasya")) {
+                    TenantContext.setTenantId(segment2);
                 } else {
                     TenantContext.setTenantId("tenant");
                 }

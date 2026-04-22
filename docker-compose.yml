@@ -29,6 +29,8 @@ services:
       - SIGNUP_KEY=${SIGNUP_KEY}
     depends_on:
       - db
+    volumes:
+      - ./uploads:/app/uploads
 
 volumes:
   postgres_data:

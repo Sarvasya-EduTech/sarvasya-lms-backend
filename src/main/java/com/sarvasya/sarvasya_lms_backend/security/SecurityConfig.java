@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/*/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/tenants/*/theme").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/tenants/*/theme/logo/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/sarvasya/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
