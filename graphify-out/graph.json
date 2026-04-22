@@ -14589,8 +14589,8 @@
       "source_file": "src\\main\\java\\com\\sarvasya\\sarvasya_lms_backend\\service\\TimeTableService.java",
       "source_location": "L129",
       "weight": 1.0,
-      "_src": "timetableservice_timetableservice_synctimetabletocalendar",
-      "_tgt": "role_getvalue",
+      "_src": "role_getvalue",
+      "_tgt": "timetableservice_timetableservice_synctimetabletocalendar",
       "source": "role_getvalue",
       "target": "timetableservice_timetableservice_synctimetabletocalendar"
     },
@@ -15501,8 +15501,8 @@
       "source_file": "src\\main\\java\\com\\sarvasya\\sarvasya_lms_backend\\service\\TimeTableService.java",
       "source_location": "L86",
       "weight": 1.0,
-      "_src": "timetableservice_timetableservice_delete",
-      "_tgt": "calendaritemrepository_calendaritemrepository_deletebyreferenceidandreferencetype",
+      "_src": "calendaritemrepository_calendaritemrepository_deletebyreferenceidandreferencetype",
+      "_tgt": "timetableservice_timetableservice_delete",
       "source": "calendaritemrepository_calendaritemrepository_deletebyreferenceidandreferencetype",
       "target": "timetableservice_timetableservice_delete"
     },
@@ -15513,8 +15513,8 @@
       "source_file": "src\\main\\java\\com\\sarvasya\\sarvasya_lms_backend\\service\\TimeTableService.java",
       "source_location": "L106",
       "weight": 1.0,
-      "_src": "timetableservice_timetableservice_synctimetabletocalendar",
-      "_tgt": "calendaritemrepository_calendaritemrepository_deletebyreferenceidandreferencetype",
+      "_src": "calendaritemrepository_calendaritemrepository_deletebyreferenceidandreferencetype",
+      "_tgt": "timetableservice_timetableservice_synctimetabletocalendar",
       "source": "calendaritemrepository_calendaritemrepository_deletebyreferenceidandreferencetype",
       "target": "timetableservice_timetableservice_synctimetabletocalendar"
     },

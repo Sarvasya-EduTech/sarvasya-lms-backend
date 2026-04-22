@@ -1,7 +1,7 @@
 # Graph Report - sarvasya-lms-backend  (2026-04-23)
 
 ## Corpus Check
-- 209 files · ~85,235 words
+- 209 files · ~85,543 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
