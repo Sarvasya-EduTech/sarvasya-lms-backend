@@ -1,12 +1,12 @@
-# Graph Report - sarvasya-lms-backend  (2026-04-22)
+# Graph Report - sarvasya-lms-backend  (2026-04-23)
 
 ## Corpus Check
-- 209 files · ~84,699 words
+- 209 files · ~85,235 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 943 nodes · 1096 edges · 151 communities detected
-- Extraction: 75% EXTRACTED · 25% INFERRED · 0% AMBIGUOUS · INFERRED: 269 edges (avg confidence: 0.8)
+- 949 nodes · 1110 edges · 149 communities detected
+- Extraction: 75% EXTRACTED · 25% INFERRED · 0% AMBIGUOUS · INFERRED: 273 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -159,8 +159,6 @@
 - [[_COMMUNITY_Community 146|Community 146]]
 - [[_COMMUNITY_Community 147|Community 147]]
 - [[_COMMUNITY_Community 148|Community 148]]
-- [[_COMMUNITY_Community 149|Community 149]]
-- [[_COMMUNITY_Community 150|Community 150]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `UserService` - 17 edges
@@ -171,8 +169,8 @@
 6. `SchemaMultiTenantConnectionProvider` - 12 edges
 7. `FeeManagementController` - 12 edges
 8. `SarvasyaCertificateController` - 10 edges
-9. `SarvasyaAttemptService` - 9 edges
-10. `BusPassController` - 8 edges
+9. `getValue()` - 9 edges
+10. `SarvasyaAttemptService` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -184,903 +182,889 @@ Cohesion: 0.03
 Nodes (19): AssignmentController, Bus, BusInfo, BusPassResponseDTO, UserInfo, BusPassService, BusScheduleService, BusService (+11 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (12): AuthController, CustomUserDetailsService, fromValue(), getValue(), Role(), TenantController, TenantIdentifierResolver, TenantLimitsController (+4 more)
+Cohesion: 0.06
+Nodes (9): AuthController, CustomUserDetailsService, JwtAuthenticationFilter, JwtUtil, getValue(), TenantController, TenantIdentifierResolver, TenantLimitsController (+1 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.07
 Nodes (6): DegreeDepartmentMappingRepository, FeeComponentRepository, FeeManagementController, FeeManagementService, FeeStructureRepository, StudentFeeRecordRepository
 
 ### Community 3 - "Community 3"
+Cohesion: 0.1
+Nodes (5): fromValue(), Role(), UserController, UserRepository, UserService
+
+### Community 4 - "Community 4"
+Cohesion: 0.07
+Nodes (5): AdmitCardController, AdmitCardService, ResultController, ResultRepository, ResultService
+
+### Community 5 - "Community 5"
 Cohesion: 0.09
 Nodes (4): SarvasyaAttemptController, SarvasyaAttemptRepository, SarvasyaAttemptService, StudentIdResolver
 
-### Community 4 - "Community 4"
+### Community 6 - "Community 6"
+Cohesion: 0.09
+Nodes (4): CalendarItemController, CalendarItemRepository, CalendarItemService, TimeTableService
+
+### Community 7 - "Community 7"
 Cohesion: 0.11
 Nodes (5): TenantContext, TenantFilter, ThemeController, ThemeSettingsRepository, ThemeSettingsService
 
-### Community 5 - "Community 5"
+### Community 8 - "Community 8"
 Cohesion: 0.11
 Nodes (4): defaultExtension(), SarvasyaCertificateController, SarvasyaCertificateRepository, SarvasyaCertificateService
 
-### Community 6 - "Community 6"
+### Community 9 - "Community 9"
 Cohesion: 0.1
 Nodes (3): SarvasyaStudentAnswerController, SarvasyaStudentAnswerRepository, SarvasyaStudentAnswerService
 
-### Community 7 - "Community 7"
-Cohesion: 0.13
-Nodes (3): ResultController, ResultRepository, ResultService
-
-### Community 8 - "Community 8"
+### Community 10 - "Community 10"
 Cohesion: 0.14
 Nodes (2): FlywayConfig, SchemaMultiTenantConnectionProvider
 
-### Community 9 - "Community 9"
-Cohesion: 0.14
-Nodes (3): CalendarItemController, CalendarItemRepository, CalendarItemService
-
-### Community 10 - "Community 10"
-Cohesion: 0.2
-Nodes (2): JwtAuthenticationFilter, JwtUtil
-
 ### Community 11 - "Community 11"
-Cohesion: 0.17
-Nodes (2): AdmitCardController, AdmitCardService
-
-### Community 12 - "Community 12"
 Cohesion: 0.15
 Nodes (2): CourseController, CourseService
 
-### Community 13 - "Community 13"
+### Community 12 - "Community 12"
 Cohesion: 0.22
 Nodes (1): BusPassController
 
-### Community 14 - "Community 14"
+### Community 13 - "Community 13"
 Cohesion: 0.25
 Nodes (1): BusScheduleController
 
-### Community 15 - "Community 15"
+### Community 14 - "Community 14"
 Cohesion: 0.29
 Nodes (1): BusController
 
-### Community 16 - "Community 16"
+### Community 15 - "Community 15"
 Cohesion: 0.29
 Nodes (1): BusStopController
 
-### Community 17 - "Community 17"
+### Community 16 - "Community 16"
 Cohesion: 0.29
 Nodes (1): SarvasyaCourseController
 
-### Community 18 - "Community 18"
+### Community 17 - "Community 17"
 Cohesion: 0.29
 Nodes (1): SarvasyaEnrollmentController
 
-### Community 19 - "Community 19"
+### Community 18 - "Community 18"
 Cohesion: 0.29
 Nodes (1): SarvasyaExamController
 
-### Community 20 - "Community 20"
+### Community 19 - "Community 19"
 Cohesion: 0.29
 Nodes (1): SarvasyaExamQuestionController
 
-### Community 21 - "Community 21"
+### Community 20 - "Community 20"
 Cohesion: 0.29
 Nodes (1): SarvasyaInvoiceController
 
-### Community 22 - "Community 22"
+### Community 21 - "Community 21"
 Cohesion: 0.29
 Nodes (1): SarvasyaLessonController
 
-### Community 23 - "Community 23"
+### Community 22 - "Community 22"
 Cohesion: 0.29
 Nodes (1): SarvasyaModuleController
 
-### Community 24 - "Community 24"
+### Community 23 - "Community 23"
 Cohesion: 0.29
 Nodes (1): SarvasyaOptionController
 
-### Community 25 - "Community 25"
+### Community 24 - "Community 24"
 Cohesion: 0.29
 Nodes (1): SarvasyaPaymentController
 
-### Community 26 - "Community 26"
+### Community 25 - "Community 25"
 Cohesion: 0.29
 Nodes (1): SarvasyaQuestionController
 
-### Community 27 - "Community 27"
+### Community 26 - "Community 26"
 Cohesion: 0.29
 Nodes (1): SarvasyaQuizController
 
-### Community 28 - "Community 28"
+### Community 27 - "Community 27"
 Cohesion: 0.29
 Nodes (1): SarvasyaQuizQuestionController
 
-### Community 29 - "Community 29"
+### Community 28 - "Community 28"
 Cohesion: 0.29
 Nodes (1): SarvasyaStudyMaterialController
 
-### Community 30 - "Community 30"
+### Community 29 - "Community 29"
 Cohesion: 0.33
 Nodes (1): SarvasyaCourseService
 
-### Community 31 - "Community 31"
+### Community 30 - "Community 30"
 Cohesion: 0.33
 Nodes (1): SarvasyaEnrollmentService
 
-### Community 32 - "Community 32"
+### Community 31 - "Community 31"
 Cohesion: 0.33
 Nodes (1): SarvasyaExamQuestionService
 
-### Community 33 - "Community 33"
-Cohesion: 0.33
-Nodes (1): SarvasyaExamService
-
-### Community 34 - "Community 34"
+### Community 32 - "Community 32"
 Cohesion: 0.33
 Nodes (1): SarvasyaInvoiceService
 
-### Community 35 - "Community 35"
+### Community 33 - "Community 33"
 Cohesion: 0.33
 Nodes (1): SarvasyaLessonService
 
-### Community 36 - "Community 36"
+### Community 34 - "Community 34"
 Cohesion: 0.33
 Nodes (1): SarvasyaOptionService
 
-### Community 37 - "Community 37"
+### Community 35 - "Community 35"
 Cohesion: 0.33
 Nodes (1): SarvasyaPaymentService
 
-### Community 38 - "Community 38"
+### Community 36 - "Community 36"
 Cohesion: 0.33
 Nodes (1): SarvasyaQuestionService
 
-### Community 39 - "Community 39"
+### Community 37 - "Community 37"
 Cohesion: 0.33
 Nodes (1): SarvasyaQuizQuestionService
 
-### Community 40 - "Community 40"
+### Community 38 - "Community 38"
 Cohesion: 0.33
 Nodes (1): SarvasyaQuizService
 
-### Community 41 - "Community 41"
+### Community 39 - "Community 39"
 Cohesion: 0.33
 Nodes (1): SarvasyaStudyMaterialService
 
-### Community 42 - "Community 42"
+### Community 40 - "Community 40"
 Cohesion: 0.33
 Nodes (5): PrimaryThemeDto, SecondaryThemeDto, SidebarThemeDto, ThemeSettingsDto, WidgetThemeDto
 
-### Community 43 - "Community 43"
+### Community 41 - "Community 41"
 Cohesion: 0.47
 Nodes (1): SecurityConfig
 
-### Community 44 - "Community 44"
+### Community 42 - "Community 42"
 Cohesion: 0.33
 Nodes (1): ClassesService
 
-### Community 45 - "Community 45"
+### Community 43 - "Community 43"
 Cohesion: 0.33
 Nodes (1): DegreeService
 
-### Community 46 - "Community 46"
+### Community 44 - "Community 44"
 Cohesion: 0.4
 Nodes (3): BusInfo, BusScheduleResponseDTO, RouteStopDTO
 
-### Community 47 - "Community 47"
+### Community 45 - "Community 45"
 Cohesion: 0.6
 Nodes (1): CalendarItem
 
-### Community 48 - "Community 48"
+### Community 46 - "Community 46"
 Cohesion: 0.4
 Nodes (1): BusPassRepository
 
-### Community 49 - "Community 49"
+### Community 47 - "Community 47"
 Cohesion: 0.4
 Nodes (1): AssignmentService
 
-### Community 50 - "Community 50"
+### Community 48 - "Community 48"
 Cohesion: 0.4
 Nodes (1): DepartmentService
 
-### Community 51 - "Community 51"
+### Community 49 - "Community 49"
 Cohesion: 0.4
 Nodes (1): ExamService
 
-### Community 52 - "Community 52"
+### Community 50 - "Community 50"
 Cohesion: 0.5
 Nodes (1): HibernateConfig
 
-### Community 53 - "Community 53"
+### Community 51 - "Community 51"
 Cohesion: 0.5
 Nodes (1): SarvasyaUploadController
 
-### Community 54 - "Community 54"
+### Community 52 - "Community 52"
 Cohesion: 0.5
 Nodes (1): SarvasyaAttempt
 
-### Community 55 - "Community 55"
+### Community 53 - "Community 53"
 Cohesion: 0.5
 Nodes (1): StudentFeeRecord
 
-### Community 56 - "Community 56"
+### Community 54 - "Community 54"
 Cohesion: 0.5
 Nodes (1): BusScheduleStopRepository
 
-### Community 57 - "Community 57"
+### Community 55 - "Community 55"
 Cohesion: 0.67
 Nodes (1): SarvasyaLmsBackendApplication
 
-### Community 58 - "Community 58"
+### Community 56 - "Community 56"
 Cohesion: 0.67
 Nodes (1): JacksonConfig
 
-### Community 59 - "Community 59"
+### Community 57 - "Community 57"
 Cohesion: 0.67
 Nodes (2): AuthResponse, UserDto
 
-### Community 60 - "Community 60"
+### Community 58 - "Community 58"
 Cohesion: 0.67
 Nodes (2): BusScheduleCreateRequest, RouteStopRequest
 
-### Community 61 - "Community 61"
+### Community 59 - "Community 59"
 Cohesion: 0.67
 Nodes (2): BusScheduleUpdateRequest, RouteStopRequest
 
-### Community 62 - "Community 62"
+### Community 60 - "Community 60"
 Cohesion: 0.67
 Nodes (2): PeriodDTO, TimeTableDTO
 
-### Community 63 - "Community 63"
+### Community 61 - "Community 61"
 Cohesion: 0.67
 Nodes (1): AdmitCard
 
-### Community 64 - "Community 64"
+### Community 62 - "Community 62"
 Cohesion: 0.67
 Nodes (1): Assignment
 
-### Community 65 - "Community 65"
+### Community 63 - "Community 63"
 Cohesion: 0.67
 Nodes (1): BaseUser
 
-### Community 66 - "Community 66"
+### Community 64 - "Community 64"
 Cohesion: 0.67
 Nodes (1): BusPass
 
-### Community 67 - "Community 67"
+### Community 65 - "Community 65"
 Cohesion: 0.67
 Nodes (1): BusSchedule
 
-### Community 68 - "Community 68"
+### Community 66 - "Community 66"
 Cohesion: 0.67
 Nodes (1): BusScheduleStop
 
-### Community 69 - "Community 69"
+### Community 67 - "Community 67"
 Cohesion: 0.67
 Nodes (1): BusStop
 
-### Community 70 - "Community 70"
+### Community 68 - "Community 68"
 Cohesion: 0.67
 Nodes (1): Classes
 
-### Community 71 - "Community 71"
+### Community 69 - "Community 69"
 Cohesion: 0.67
 Nodes (1): Course
 
-### Community 72 - "Community 72"
+### Community 70 - "Community 70"
 Cohesion: 0.67
 Nodes (1): Degree
 
-### Community 73 - "Community 73"
+### Community 71 - "Community 71"
 Cohesion: 0.67
 Nodes (1): DegreeDepartmentMapping
 
-### Community 74 - "Community 74"
+### Community 72 - "Community 72"
 Cohesion: 0.67
 Nodes (1): Department
 
-### Community 75 - "Community 75"
+### Community 73 - "Community 73"
 Cohesion: 0.67
 Nodes (1): Exam
 
-### Community 76 - "Community 76"
+### Community 74 - "Community 74"
 Cohesion: 0.67
 Nodes (1): FeeComponent
 
-### Community 77 - "Community 77"
+### Community 75 - "Community 75"
 Cohesion: 0.67
 Nodes (1): FeeStructure
 
-### Community 78 - "Community 78"
+### Community 76 - "Community 76"
 Cohesion: 0.67
 Nodes (1): Result
 
-### Community 79 - "Community 79"
+### Community 77 - "Community 77"
 Cohesion: 0.67
 Nodes (1): ResultItem
 
-### Community 80 - "Community 80"
+### Community 78 - "Community 78"
 Cohesion: 0.67
 Nodes (1): SarvasyaCertificate
 
-### Community 81 - "Community 81"
+### Community 79 - "Community 79"
 Cohesion: 0.67
 Nodes (1): SarvasyaCourse
 
-### Community 82 - "Community 82"
+### Community 80 - "Community 80"
 Cohesion: 0.67
 Nodes (1): SarvasyaEnrollment
 
-### Community 83 - "Community 83"
+### Community 81 - "Community 81"
 Cohesion: 0.67
 Nodes (1): SarvasyaExam
 
-### Community 84 - "Community 84"
+### Community 82 - "Community 82"
 Cohesion: 0.67
 Nodes (1): SarvasyaExamQuestion
 
-### Community 85 - "Community 85"
+### Community 83 - "Community 83"
 Cohesion: 0.67
 Nodes (1): SarvasyaInvoice
 
-### Community 86 - "Community 86"
+### Community 84 - "Community 84"
 Cohesion: 0.67
 Nodes (1): SarvasyaLesson
 
-### Community 87 - "Community 87"
+### Community 85 - "Community 85"
 Cohesion: 0.67
 Nodes (1): SarvasyaModule
 
-### Community 88 - "Community 88"
+### Community 86 - "Community 86"
 Cohesion: 0.67
 Nodes (1): SarvasyaOption
 
-### Community 89 - "Community 89"
+### Community 87 - "Community 87"
 Cohesion: 0.67
 Nodes (1): SarvasyaPayment
 
-### Community 90 - "Community 90"
+### Community 88 - "Community 88"
 Cohesion: 0.67
 Nodes (1): SarvasyaQuestion
 
-### Community 91 - "Community 91"
+### Community 89 - "Community 89"
 Cohesion: 0.67
 Nodes (1): SarvasyaQuiz
 
-### Community 92 - "Community 92"
+### Community 90 - "Community 90"
 Cohesion: 0.67
 Nodes (1): SarvasyaQuizQuestion
 
-### Community 93 - "Community 93"
+### Community 91 - "Community 91"
 Cohesion: 0.67
 Nodes (1): SarvasyaStudentAnswer
 
-### Community 94 - "Community 94"
+### Community 92 - "Community 92"
 Cohesion: 0.67
 Nodes (1): SarvasyaStudyMaterial
 
-### Community 95 - "Community 95"
+### Community 93 - "Community 93"
 Cohesion: 0.67
 Nodes (1): TimeTable
 
-### Community 96 - "Community 96"
+### Community 94 - "Community 94"
 Cohesion: 0.67
 Nodes (1): TimeTableEntry
 
-### Community 97 - "Community 97"
+### Community 95 - "Community 95"
 Cohesion: 0.67
 Nodes (1): AdmitCardRepository
 
-### Community 98 - "Community 98"
+### Community 96 - "Community 96"
 Cohesion: 0.67
 Nodes (1): BusScheduleRepository
 
-### Community 99 - "Community 99"
+### Community 97 - "Community 97"
 Cohesion: 0.67
 Nodes (1): CourseRepository
 
-### Community 100 - "Community 100"
+### Community 98 - "Community 98"
 Cohesion: 0.67
 Nodes (1): GlobalUserRepository
 
-### Community 101 - "Community 101"
+### Community 99 - "Community 99"
 Cohesion: 0.67
 Nodes (1): SarvasyaLmsBackendApplicationTests
 
-### Community 102 - "Community 102"
+### Community 100 - "Community 100"
 Cohesion: 1.0
 Nodes (1): AuthRequest
 
-### Community 103 - "Community 103"
+### Community 101 - "Community 101"
 Cohesion: 1.0
 Nodes (1): BulkUserDeleteRequest
 
-### Community 104 - "Community 104"
+### Community 102 - "Community 102"
 Cohesion: 1.0
 Nodes (1): BusPassCreateRequest
 
-### Community 105 - "Community 105"
+### Community 103 - "Community 103"
 Cohesion: 1.0
 Nodes (1): BusPassUpdateRequest
 
-### Community 106 - "Community 106"
+### Community 104 - "Community 104"
 Cohesion: 1.0
 Nodes (1): BusStopRequest
 
-### Community 107 - "Community 107"
+### Community 105 - "Community 105"
 Cohesion: 1.0
 Nodes (1): SarvasyaAttemptDTO
 
-### Community 108 - "Community 108"
+### Community 106 - "Community 106"
 Cohesion: 1.0
 Nodes (1): SarvasyaCertificateDTO
 
-### Community 109 - "Community 109"
+### Community 107 - "Community 107"
 Cohesion: 1.0
 Nodes (1): SarvasyaCourseDTO
 
-### Community 110 - "Community 110"
+### Community 108 - "Community 108"
 Cohesion: 1.0
 Nodes (1): SarvasyaEnrollmentDTO
 
-### Community 111 - "Community 111"
+### Community 109 - "Community 109"
 Cohesion: 1.0
 Nodes (1): SarvasyaExamDTO
 
-### Community 112 - "Community 112"
+### Community 110 - "Community 110"
 Cohesion: 1.0
 Nodes (1): SarvasyaExamQuestionDTO
 
-### Community 113 - "Community 113"
+### Community 111 - "Community 111"
 Cohesion: 1.0
 Nodes (1): SarvasyaInvoiceDTO
 
-### Community 114 - "Community 114"
+### Community 112 - "Community 112"
 Cohesion: 1.0
 Nodes (1): SarvasyaLessonDTO
 
-### Community 115 - "Community 115"
+### Community 113 - "Community 113"
 Cohesion: 1.0
 Nodes (1): SarvasyaModuleDTO
 
-### Community 116 - "Community 116"
+### Community 114 - "Community 114"
 Cohesion: 1.0
 Nodes (1): SarvasyaOptionDTO
 
-### Community 117 - "Community 117"
+### Community 115 - "Community 115"
 Cohesion: 1.0
 Nodes (1): SarvasyaPaymentDTO
 
-### Community 118 - "Community 118"
+### Community 116 - "Community 116"
 Cohesion: 1.0
 Nodes (1): SarvasyaQuestionDTO
 
-### Community 119 - "Community 119"
+### Community 117 - "Community 117"
 Cohesion: 1.0
 Nodes (1): SarvasyaQuizDTO
 
-### Community 120 - "Community 120"
+### Community 118 - "Community 118"
 Cohesion: 1.0
 Nodes (1): SarvasyaQuizQuestionDTO
 
-### Community 121 - "Community 121"
+### Community 119 - "Community 119"
 Cohesion: 1.0
 Nodes (1): SarvasyaStudentAnswerDTO
 
-### Community 122 - "Community 122"
+### Community 120 - "Community 120"
 Cohesion: 1.0
 Nodes (1): SarvasyaStudyMaterialDTO
 
-### Community 123 - "Community 123"
+### Community 121 - "Community 121"
 Cohesion: 1.0
 Nodes (1): SignupRequest
 
-### Community 124 - "Community 124"
+### Community 122 - "Community 122"
 Cohesion: 1.0
 Nodes (1): TenantLimitsDto
 
-### Community 125 - "Community 125"
+### Community 123 - "Community 123"
 Cohesion: 1.0
 Nodes (1): UserCreateRequest
 
-### Community 126 - "Community 126"
+### Community 124 - "Community 124"
 Cohesion: 1.0
 Nodes (1): GlobalUser
 
-### Community 127 - "Community 127"
+### Community 125 - "Community 125"
 Cohesion: 1.0
 Nodes (1): TenantConfig
 
-### Community 128 - "Community 128"
+### Community 126 - "Community 126"
 Cohesion: 1.0
 Nodes (1): TenantLimits
 
-### Community 129 - "Community 129"
+### Community 127 - "Community 127"
 Cohesion: 1.0
 Nodes (1): ThemeSettings
 
-### Community 130 - "Community 130"
+### Community 128 - "Community 128"
 Cohesion: 1.0
 Nodes (1): AssignmentRepository
 
-### Community 131 - "Community 131"
+### Community 129 - "Community 129"
 Cohesion: 1.0
 Nodes (1): BusRepository
 
-### Community 132 - "Community 132"
+### Community 130 - "Community 130"
 Cohesion: 1.0
 Nodes (1): ClassesRepository
 
-### Community 133 - "Community 133"
+### Community 131 - "Community 131"
 Cohesion: 1.0
 Nodes (1): DegreeRepository
 
-### Community 134 - "Community 134"
+### Community 132 - "Community 132"
 Cohesion: 1.0
 Nodes (1): DepartmentRepository
 
-### Community 135 - "Community 135"
+### Community 133 - "Community 133"
 Cohesion: 1.0
 Nodes (1): ExamRepository
 
-### Community 136 - "Community 136"
+### Community 134 - "Community 134"
 Cohesion: 1.0
 Nodes (1): SarvasyaCourseRepository
 
-### Community 137 - "Community 137"
+### Community 135 - "Community 135"
 Cohesion: 1.0
 Nodes (1): SarvasyaEnrollmentRepository
 
-### Community 138 - "Community 138"
+### Community 136 - "Community 136"
 Cohesion: 1.0
 Nodes (1): SarvasyaExamQuestionRepository
 
-### Community 139 - "Community 139"
+### Community 137 - "Community 137"
 Cohesion: 1.0
 Nodes (1): SarvasyaExamRepository
 
-### Community 140 - "Community 140"
+### Community 138 - "Community 138"
 Cohesion: 1.0
 Nodes (1): SarvasyaInvoiceRepository
 
-### Community 141 - "Community 141"
+### Community 139 - "Community 139"
 Cohesion: 1.0
 Nodes (1): SarvasyaLessonRepository
 
-### Community 142 - "Community 142"
+### Community 140 - "Community 140"
 Cohesion: 1.0
 Nodes (1): SarvasyaModuleRepository
 
-### Community 143 - "Community 143"
+### Community 141 - "Community 141"
 Cohesion: 1.0
 Nodes (1): SarvasyaOptionRepository
 
-### Community 144 - "Community 144"
+### Community 142 - "Community 142"
 Cohesion: 1.0
 Nodes (1): SarvasyaPaymentRepository
 
-### Community 145 - "Community 145"
+### Community 143 - "Community 143"
 Cohesion: 1.0
 Nodes (1): SarvasyaQuestionRepository
 
-### Community 146 - "Community 146"
+### Community 144 - "Community 144"
 Cohesion: 1.0
 Nodes (1): SarvasyaQuizQuestionRepository
 
-### Community 147 - "Community 147"
+### Community 145 - "Community 145"
 Cohesion: 1.0
 Nodes (1): SarvasyaQuizRepository
 
-### Community 148 - "Community 148"
+### Community 146 - "Community 146"
 Cohesion: 1.0
 Nodes (1): SarvasyaStudyMaterialRepository
 
-### Community 149 - "Community 149"
+### Community 147 - "Community 147"
 Cohesion: 1.0
 Nodes (1): TenantConfigRepository
 
-### Community 150 - "Community 150"
+### Community 148 - "Community 148"
 Cohesion: 1.0
 Nodes (1): TimeTableRepository
 
 ## Knowledge Gaps
 - **66 isolated node(s):** `AuthRequest`, `AuthResponse`, `UserDto`, `BulkUserDeleteRequest`, `BusPassCreateRequest` (+61 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 8`** (18 nodes): `FlywayConfig`, `.flyway()`, `.getMigratedSchemas()`, `.migrateTenantSchema()`, `FlywayConfig.java`, `SchemaMultiTenantConnectionProvider.java`, `SchemaMultiTenantConnectionProvider`, `.getAllTenants()`, `.getAnyConnection()`, `.getConnection()`, `.initializeSchemaAndTables()`, `.initializeSchemaManually()`, `.isUnwrappableAs()`, `.releaseAnyConnection()`, `.releaseConnection()`, `.SchemaMultiTenantConnectionProvider()`, `.supportsAggressiveRelease()`, `.unwrap()`
+- **Thin community `Community 10`** (18 nodes): `FlywayConfig`, `.flyway()`, `.getMigratedSchemas()`, `.migrateTenantSchema()`, `FlywayConfig.java`, `SchemaMultiTenantConnectionProvider.java`, `SchemaMultiTenantConnectionProvider`, `.getAllTenants()`, `.getAnyConnection()`, `.getConnection()`, `.initializeSchemaAndTables()`, `.initializeSchemaManually()`, `.isUnwrappableAs()`, `.releaseAnyConnection()`, `.releaseConnection()`, `.SchemaMultiTenantConnectionProvider()`, `.supportsAggressiveRelease()`, `.unwrap()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 10`** (17 nodes): `JwtAuthenticationFilter`, `.doFilterInternal()`, `JwtUtil`, `.createToken()`, `.extractAllClaims()`, `.extractClaim()`, `.extractExpiration()`, `.extractUsername()`, `.generateImpersonationToken()`, `.generateToken()`, `.generateTokenForEmail()`, `.getSigningKey()`, `.init()`, `.isTokenExpired()`, `.validateToken()`, `JwtAuthenticationFilter.java`, `JwtUtil.java`
+- **Thin community `Community 11`** (13 nodes): `CourseController`, `.create()`, `.delete()`, `.getAll()`, `.getByDepartment()`, `.update()`, `CourseService`, `.delete()`, `.findAll()`, `.findByDepartmentId()`, `.save()`, `CourseController.java`, `CourseService.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 11`** (15 nodes): `AdmitCardController`, `.create()`, `.delete()`, `.getAll()`, `.getByClass()`, `.update()`, `AdmitCardService`, `.createAdmitCard()`, `.deleteAdmitCard()`, `.generatePdf()`, `.getAdmitCardsByClass()`, `.getAllAdmitCards()`, `AdmitCardController.java`, `AdmitCardService.java`, `.findByClassId()`
+- **Thin community `Community 12`** (9 nodes): `BusPassController`, `.createBusPass()`, `.deleteBusPass()`, `.getAllBusPasses()`, `.getBusPassById()`, `.getBusPassesByBusId()`, `.getBusPassesByUserId()`, `.updateBusPass()`, `BusPassController.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 12`** (13 nodes): `CourseController`, `.create()`, `.delete()`, `.getAll()`, `.getByDepartment()`, `.update()`, `CourseService`, `.delete()`, `.findAll()`, `.findByDepartmentId()`, `.save()`, `CourseController.java`, `CourseService.java`
+- **Thin community `Community 13`** (8 nodes): `BusScheduleController`, `.createBusSchedule()`, `.deleteBusSchedule()`, `.getAllBusSchedules()`, `.getBusScheduleById()`, `.getBusSchedulesByBusId()`, `.updateBusSchedule()`, `BusScheduleController.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 13`** (9 nodes): `BusPassController`, `.createBusPass()`, `.deleteBusPass()`, `.getAllBusPasses()`, `.getBusPassById()`, `.getBusPassesByBusId()`, `.getBusPassesByUserId()`, `.updateBusPass()`, `BusPassController.java`
+- **Thin community `Community 14`** (7 nodes): `BusController`, `.createBus()`, `.deleteBus()`, `.getAllBuses()`, `.getBusById()`, `.updateBus()`, `BusController.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 14`** (8 nodes): `BusScheduleController`, `.createBusSchedule()`, `.deleteBusSchedule()`, `.getAllBusSchedules()`, `.getBusScheduleById()`, `.getBusSchedulesByBusId()`, `.updateBusSchedule()`, `BusScheduleController.java`
+- **Thin community `Community 15`** (7 nodes): `BusStopController`, `.createBusStop()`, `.deleteBusStop()`, `.getBusStopById()`, `.getStopsByBusId()`, `.updateBusStop()`, `BusStopController.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 15`** (7 nodes): `BusController`, `.createBus()`, `.deleteBus()`, `.getAllBuses()`, `.getBusById()`, `.updateBus()`, `BusController.java`
+- **Thin community `Community 16`** (7 nodes): `SarvasyaCourseController.java`, `SarvasyaCourseController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 16`** (7 nodes): `BusStopController`, `.createBusStop()`, `.deleteBusStop()`, `.getBusStopById()`, `.getStopsByBusId()`, `.updateBusStop()`, `BusStopController.java`
+- **Thin community `Community 17`** (7 nodes): `SarvasyaEnrollmentController.java`, `SarvasyaEnrollmentController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 17`** (7 nodes): `SarvasyaCourseController.java`, `SarvasyaCourseController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 18`** (7 nodes): `SarvasyaExamController.java`, `SarvasyaExamController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 18`** (7 nodes): `SarvasyaEnrollmentController.java`, `SarvasyaEnrollmentController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 19`** (7 nodes): `SarvasyaExamQuestionController.java`, `SarvasyaExamQuestionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 19`** (7 nodes): `SarvasyaExamController.java`, `SarvasyaExamController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 20`** (7 nodes): `SarvasyaInvoiceController.java`, `SarvasyaInvoiceController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 20`** (7 nodes): `SarvasyaExamQuestionController.java`, `SarvasyaExamQuestionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 21`** (7 nodes): `SarvasyaLessonController.java`, `SarvasyaLessonController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 21`** (7 nodes): `SarvasyaInvoiceController.java`, `SarvasyaInvoiceController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 22`** (7 nodes): `SarvasyaModuleController.java`, `SarvasyaModuleController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 22`** (7 nodes): `SarvasyaLessonController.java`, `SarvasyaLessonController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 23`** (7 nodes): `SarvasyaOptionController.java`, `SarvasyaOptionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 23`** (7 nodes): `SarvasyaModuleController.java`, `SarvasyaModuleController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 24`** (7 nodes): `SarvasyaPaymentController.java`, `SarvasyaPaymentController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 24`** (7 nodes): `SarvasyaOptionController.java`, `SarvasyaOptionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 25`** (7 nodes): `SarvasyaQuestionController.java`, `SarvasyaQuestionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 25`** (7 nodes): `SarvasyaPaymentController.java`, `SarvasyaPaymentController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 26`** (7 nodes): `SarvasyaQuizController.java`, `SarvasyaQuizController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (7 nodes): `SarvasyaQuestionController.java`, `SarvasyaQuestionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 27`** (7 nodes): `SarvasyaQuizQuestionController.java`, `SarvasyaQuizQuestionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (7 nodes): `SarvasyaQuizController.java`, `SarvasyaQuizController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 28`** (7 nodes): `SarvasyaStudyMaterialController.java`, `SarvasyaStudyMaterialController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (7 nodes): `SarvasyaQuizQuestionController.java`, `SarvasyaQuizQuestionController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 29`** (7 nodes): `SarvasyaCourseService.java`, `SarvasyaCourseService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 29`** (7 nodes): `SarvasyaStudyMaterialController.java`, `SarvasyaStudyMaterialController`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 30`** (7 nodes): `SarvasyaEnrollmentService.java`, `SarvasyaEnrollmentService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (7 nodes): `SarvasyaCourseService.java`, `SarvasyaCourseService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 31`** (7 nodes): `SarvasyaExamQuestionService.java`, `SarvasyaExamQuestionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (7 nodes): `SarvasyaEnrollmentService.java`, `SarvasyaEnrollmentService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 32`** (7 nodes): `SarvasyaInvoiceService.java`, `SarvasyaInvoiceService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (7 nodes): `SarvasyaExamQuestionService.java`, `SarvasyaExamQuestionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 33`** (7 nodes): `SarvasyaLessonService.java`, `SarvasyaLessonService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (7 nodes): `SarvasyaExamService.java`, `SarvasyaExamService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 34`** (7 nodes): `SarvasyaOptionService.java`, `SarvasyaOptionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (7 nodes): `SarvasyaInvoiceService.java`, `SarvasyaInvoiceService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 35`** (7 nodes): `SarvasyaPaymentService.java`, `SarvasyaPaymentService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (7 nodes): `SarvasyaLessonService.java`, `SarvasyaLessonService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 36`** (7 nodes): `SarvasyaQuestionService.java`, `SarvasyaQuestionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (7 nodes): `SarvasyaOptionService.java`, `SarvasyaOptionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 37`** (7 nodes): `SarvasyaQuizQuestionService.java`, `SarvasyaQuizQuestionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 37`** (7 nodes): `SarvasyaPaymentService.java`, `SarvasyaPaymentService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 38`** (7 nodes): `SarvasyaQuizService.java`, `SarvasyaQuizService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (7 nodes): `SarvasyaQuestionService.java`, `SarvasyaQuestionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 39`** (7 nodes): `SarvasyaStudyMaterialService.java`, `SarvasyaStudyMaterialService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (7 nodes): `SarvasyaQuizQuestionService.java`, `SarvasyaQuizQuestionService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 41`** (6 nodes): `SecurityConfig.java`, `SecurityConfig`, `.authenticationManager()`, `.authenticationProvider()`, `.passwordEncoder()`, `.securityFilterChain()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (7 nodes): `SarvasyaQuizService.java`, `SarvasyaQuizService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 42`** (6 nodes): `ClassesService`, `.delete()`, `.findAll()`, `.findById()`, `.save()`, `ClassesService.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (7 nodes): `SarvasyaStudyMaterialService.java`, `SarvasyaStudyMaterialService`, `.create()`, `.delete()`, `.findAll()`, `.findById()`, `.update()`
+- **Thin community `Community 43`** (6 nodes): `DegreeService`, `.delete()`, `.findAll()`, `.findById()`, `.save()`, `DegreeService.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (6 nodes): `SecurityConfig.java`, `SecurityConfig`, `.authenticationManager()`, `.authenticationProvider()`, `.passwordEncoder()`, `.securityFilterChain()`
+- **Thin community `Community 45`** (5 nodes): `CalendarItem`, `.onCreate()`, `.onUpdate()`, `.validateReferences()`, `CalendarItem.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (6 nodes): `ClassesService`, `.delete()`, `.findAll()`, `.findById()`, `.save()`, `ClassesService.java`
+- **Thin community `Community 46`** (5 nodes): `BusPassRepository`, `.findByBusId()`, `.findByUserId()`, `.getBusPassesByUserId()`, `BusPassRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (6 nodes): `DegreeService`, `.delete()`, `.findAll()`, `.findById()`, `.save()`, `DegreeService.java`
+- **Thin community `Community 47`** (5 nodes): `AssignmentService`, `.delete()`, `.findAll()`, `.save()`, `AssignmentService.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (5 nodes): `CalendarItem`, `.onCreate()`, `.onUpdate()`, `.validateReferences()`, `CalendarItem.java`
+- **Thin community `Community 48`** (5 nodes): `DepartmentService`, `.delete()`, `.findAll()`, `.save()`, `DepartmentService.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (5 nodes): `BusPassRepository`, `.findByBusId()`, `.findByUserId()`, `.getBusPassesByUserId()`, `BusPassRepository.java`
+- **Thin community `Community 49`** (5 nodes): `ExamService`, `.delete()`, `.findAll()`, `.save()`, `ExamService.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (5 nodes): `AssignmentService`, `.delete()`, `.findAll()`, `.save()`, `AssignmentService.java`
+- **Thin community `Community 50`** (4 nodes): `HibernateConfig`, `.HibernateConfig()`, `.postProcessBeforeInitialization()`, `HibernateConfig.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (5 nodes): `DepartmentService`, `.delete()`, `.findAll()`, `.save()`, `DepartmentService.java`
+- **Thin community `Community 51`** (4 nodes): `SarvasyaUploadController.java`, `SarvasyaUploadController`, `.getVideo()`, `.uploadVideo()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (5 nodes): `ExamService`, `.delete()`, `.findAll()`, `.save()`, `ExamService.java`
+- **Thin community `Community 52`** (4 nodes): `SarvasyaAttempt.java`, `SarvasyaAttempt`, `.generateId()`, `.touchUpdatedAt()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (4 nodes): `HibernateConfig`, `.HibernateConfig()`, `.postProcessBeforeInitialization()`, `HibernateConfig.java`
+- **Thin community `Community 53`** (4 nodes): `StudentFeeRecord.java`, `StudentFeeRecord`, `.onCreate()`, `.onUpdate()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (4 nodes): `SarvasyaUploadController.java`, `SarvasyaUploadController`, `.getVideo()`, `.uploadVideo()`
+- **Thin community `Community 54`** (4 nodes): `BusScheduleStopRepository`, `.deleteByScheduleId()`, `.findByScheduleIdOrderBySequenceNumber()`, `BusScheduleStopRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (4 nodes): `SarvasyaAttempt.java`, `SarvasyaAttempt`, `.generateId()`, `.touchUpdatedAt()`
+- **Thin community `Community 55`** (3 nodes): `SarvasyaLmsBackendApplication.java`, `SarvasyaLmsBackendApplication`, `.main()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 55`** (4 nodes): `StudentFeeRecord.java`, `StudentFeeRecord`, `.onCreate()`, `.onUpdate()`
+- **Thin community `Community 56`** (3 nodes): `JacksonConfig`, `.objectMapper()`, `JacksonConfig.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (4 nodes): `BusScheduleStopRepository`, `.deleteByScheduleId()`, `.findByScheduleIdOrderBySequenceNumber()`, `BusScheduleStopRepository.java`
+- **Thin community `Community 57`** (3 nodes): `AuthResponse`, `UserDto`, `AuthResponse.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (3 nodes): `SarvasyaLmsBackendApplication.java`, `SarvasyaLmsBackendApplication`, `.main()`
+- **Thin community `Community 58`** (3 nodes): `BusScheduleCreateRequest`, `RouteStopRequest`, `BusScheduleCreateRequest.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (3 nodes): `JacksonConfig`, `.objectMapper()`, `JacksonConfig.java`
+- **Thin community `Community 59`** (3 nodes): `BusScheduleUpdateRequest`, `RouteStopRequest`, `BusScheduleUpdateRequest.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (3 nodes): `AuthResponse`, `UserDto`, `AuthResponse.java`
+- **Thin community `Community 60`** (3 nodes): `TimeTableDTO.java`, `PeriodDTO`, `TimeTableDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (3 nodes): `BusScheduleCreateRequest`, `RouteStopRequest`, `BusScheduleCreateRequest.java`
+- **Thin community `Community 61`** (3 nodes): `AdmitCard`, `.onCreate()`, `AdmitCard.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (3 nodes): `BusScheduleUpdateRequest`, `RouteStopRequest`, `BusScheduleUpdateRequest.java`
+- **Thin community `Community 62`** (3 nodes): `Assignment`, `.onCreate()`, `Assignment.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (3 nodes): `TimeTableDTO.java`, `PeriodDTO`, `TimeTableDTO`
+- **Thin community `Community 63`** (3 nodes): `BaseUser`, `.generateId()`, `BaseUser.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (3 nodes): `AdmitCard`, `.onCreate()`, `AdmitCard.java`
+- **Thin community `Community 64`** (3 nodes): `BusPass`, `.generateId()`, `BusPass.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 64`** (3 nodes): `Assignment`, `.onCreate()`, `Assignment.java`
+- **Thin community `Community 65`** (3 nodes): `BusSchedule`, `.generateId()`, `BusSchedule.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 65`** (3 nodes): `BaseUser`, `.generateId()`, `BaseUser.java`
+- **Thin community `Community 66`** (3 nodes): `BusScheduleStop`, `.generateId()`, `BusScheduleStop.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 66`** (3 nodes): `BusPass`, `.generateId()`, `BusPass.java`
+- **Thin community `Community 67`** (3 nodes): `BusStop`, `.generateId()`, `BusStop.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 67`** (3 nodes): `BusSchedule`, `.generateId()`, `BusSchedule.java`
+- **Thin community `Community 68`** (3 nodes): `Classes`, `.onCreate()`, `Classes.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (3 nodes): `BusScheduleStop`, `.generateId()`, `BusScheduleStop.java`
+- **Thin community `Community 69`** (3 nodes): `Course`, `.onCreate()`, `Course.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (3 nodes): `BusStop`, `.generateId()`, `BusStop.java`
+- **Thin community `Community 70`** (3 nodes): `Degree`, `.onCreate()`, `Degree.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 70`** (3 nodes): `Classes`, `.onCreate()`, `Classes.java`
+- **Thin community `Community 71`** (3 nodes): `DegreeDepartmentMapping`, `.onCreate()`, `DegreeDepartmentMapping.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 71`** (3 nodes): `Course`, `.onCreate()`, `Course.java`
+- **Thin community `Community 72`** (3 nodes): `Department`, `.onCreate()`, `Department.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 72`** (3 nodes): `Degree`, `.onCreate()`, `Degree.java`
+- **Thin community `Community 73`** (3 nodes): `Exam`, `.onCreate()`, `Exam.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 73`** (3 nodes): `DegreeDepartmentMapping`, `.onCreate()`, `DegreeDepartmentMapping.java`
+- **Thin community `Community 74`** (3 nodes): `FeeComponent`, `.onCreate()`, `FeeComponent.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 74`** (3 nodes): `Department`, `.onCreate()`, `Department.java`
+- **Thin community `Community 75`** (3 nodes): `FeeStructure`, `.onCreate()`, `FeeStructure.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 75`** (3 nodes): `Exam`, `.onCreate()`, `Exam.java`
+- **Thin community `Community 76`** (3 nodes): `Result.java`, `Result`, `.onCreate()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 76`** (3 nodes): `FeeComponent`, `.onCreate()`, `FeeComponent.java`
+- **Thin community `Community 77`** (3 nodes): `ResultItem.java`, `ResultItem`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 77`** (3 nodes): `FeeStructure`, `.onCreate()`, `FeeStructure.java`
+- **Thin community `Community 78`** (3 nodes): `SarvasyaCertificate.java`, `SarvasyaCertificate`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 78`** (3 nodes): `Result.java`, `Result`, `.onCreate()`
+- **Thin community `Community 79`** (3 nodes): `SarvasyaCourse.java`, `SarvasyaCourse`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (3 nodes): `ResultItem.java`, `ResultItem`, `.generateId()`
+- **Thin community `Community 80`** (3 nodes): `SarvasyaEnrollment.java`, `SarvasyaEnrollment`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (3 nodes): `SarvasyaCertificate.java`, `SarvasyaCertificate`, `.generateId()`
+- **Thin community `Community 81`** (3 nodes): `SarvasyaExam.java`, `SarvasyaExam`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (3 nodes): `SarvasyaCourse.java`, `SarvasyaCourse`, `.generateId()`
+- **Thin community `Community 82`** (3 nodes): `SarvasyaExamQuestion.java`, `SarvasyaExamQuestion`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (3 nodes): `SarvasyaEnrollment.java`, `SarvasyaEnrollment`, `.generateId()`
+- **Thin community `Community 83`** (3 nodes): `SarvasyaInvoice.java`, `SarvasyaInvoice`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (3 nodes): `SarvasyaExam.java`, `SarvasyaExam`, `.generateId()`
+- **Thin community `Community 84`** (3 nodes): `SarvasyaLesson.java`, `SarvasyaLesson`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (3 nodes): `SarvasyaExamQuestion.java`, `SarvasyaExamQuestion`, `.generateId()`
+- **Thin community `Community 85`** (3 nodes): `SarvasyaModule.java`, `SarvasyaModule`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 85`** (3 nodes): `SarvasyaInvoice.java`, `SarvasyaInvoice`, `.generateId()`
+- **Thin community `Community 86`** (3 nodes): `SarvasyaOption.java`, `SarvasyaOption`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 86`** (3 nodes): `SarvasyaLesson.java`, `SarvasyaLesson`, `.generateId()`
+- **Thin community `Community 87`** (3 nodes): `SarvasyaPayment.java`, `SarvasyaPayment`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 87`** (3 nodes): `SarvasyaModule.java`, `SarvasyaModule`, `.generateId()`
+- **Thin community `Community 88`** (3 nodes): `SarvasyaQuestion.java`, `SarvasyaQuestion`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 88`** (3 nodes): `SarvasyaOption.java`, `SarvasyaOption`, `.generateId()`
+- **Thin community `Community 89`** (3 nodes): `SarvasyaQuiz.java`, `SarvasyaQuiz`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 89`** (3 nodes): `SarvasyaPayment.java`, `SarvasyaPayment`, `.generateId()`
+- **Thin community `Community 90`** (3 nodes): `SarvasyaQuizQuestion.java`, `SarvasyaQuizQuestion`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 90`** (3 nodes): `SarvasyaQuestion.java`, `SarvasyaQuestion`, `.generateId()`
+- **Thin community `Community 91`** (3 nodes): `SarvasyaStudentAnswer.java`, `SarvasyaStudentAnswer`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 91`** (3 nodes): `SarvasyaQuiz.java`, `SarvasyaQuiz`, `.generateId()`
+- **Thin community `Community 92`** (3 nodes): `SarvasyaStudyMaterial.java`, `SarvasyaStudyMaterial`, `.generateId()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 92`** (3 nodes): `SarvasyaQuizQuestion.java`, `SarvasyaQuizQuestion`, `.generateId()`
+- **Thin community `Community 93`** (3 nodes): `TimeTable.java`, `TimeTable`, `.onCreate()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 93`** (3 nodes): `SarvasyaStudentAnswer.java`, `SarvasyaStudentAnswer`, `.generateId()`
+- **Thin community `Community 94`** (3 nodes): `TimeTableEntry.java`, `TimeTableEntry`, `.onCreate()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 94`** (3 nodes): `SarvasyaStudyMaterial.java`, `SarvasyaStudyMaterial`, `.generateId()`
+- **Thin community `Community 95`** (3 nodes): `AdmitCardRepository`, `.findByClassId()`, `AdmitCardRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 95`** (3 nodes): `TimeTable.java`, `TimeTable`, `.onCreate()`
+- **Thin community `Community 96`** (3 nodes): `BusScheduleRepository`, `.findByBusId()`, `BusScheduleRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 96`** (3 nodes): `TimeTableEntry.java`, `TimeTableEntry`, `.onCreate()`
+- **Thin community `Community 97`** (3 nodes): `CourseRepository`, `.findByDepartmentId()`, `CourseRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 97`** (3 nodes): `AdmitCardRepository`, `.findByClassId()`, `AdmitCardRepository.java`
+- **Thin community `Community 98`** (3 nodes): `GlobalUserRepository`, `.findByEmail()`, `GlobalUserRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 98`** (3 nodes): `BusScheduleRepository`, `.findByBusId()`, `BusScheduleRepository.java`
+- **Thin community `Community 99`** (3 nodes): `SarvasyaLmsBackendApplicationTests`, `.contextLoads()`, `SarvasyaLmsBackendApplicationTests.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 99`** (3 nodes): `CourseRepository`, `.findByDepartmentId()`, `CourseRepository.java`
+- **Thin community `Community 100`** (2 nodes): `AuthRequest`, `AuthRequest.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 100`** (3 nodes): `GlobalUserRepository`, `.findByEmail()`, `GlobalUserRepository.java`
+- **Thin community `Community 101`** (2 nodes): `BulkUserDeleteRequest`, `BulkUserDeleteRequest.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 101`** (3 nodes): `SarvasyaLmsBackendApplicationTests`, `.contextLoads()`, `SarvasyaLmsBackendApplicationTests.java`
+- **Thin community `Community 102`** (2 nodes): `BusPassCreateRequest`, `BusPassCreateRequest.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 102`** (2 nodes): `AuthRequest`, `AuthRequest.java`
+- **Thin community `Community 103`** (2 nodes): `BusPassUpdateRequest`, `BusPassUpdateRequest.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 103`** (2 nodes): `BulkUserDeleteRequest`, `BulkUserDeleteRequest.java`
+- **Thin community `Community 104`** (2 nodes): `BusStopRequest`, `BusStopRequest.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 104`** (2 nodes): `BusPassCreateRequest`, `BusPassCreateRequest.java`
+- **Thin community `Community 105`** (2 nodes): `SarvasyaAttemptDTO.java`, `SarvasyaAttemptDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 105`** (2 nodes): `BusPassUpdateRequest`, `BusPassUpdateRequest.java`
+- **Thin community `Community 106`** (2 nodes): `SarvasyaCertificateDTO.java`, `SarvasyaCertificateDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 106`** (2 nodes): `BusStopRequest`, `BusStopRequest.java`
+- **Thin community `Community 107`** (2 nodes): `SarvasyaCourseDTO.java`, `SarvasyaCourseDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 107`** (2 nodes): `SarvasyaAttemptDTO.java`, `SarvasyaAttemptDTO`
+- **Thin community `Community 108`** (2 nodes): `SarvasyaEnrollmentDTO.java`, `SarvasyaEnrollmentDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 108`** (2 nodes): `SarvasyaCertificateDTO.java`, `SarvasyaCertificateDTO`
+- **Thin community `Community 109`** (2 nodes): `SarvasyaExamDTO.java`, `SarvasyaExamDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 109`** (2 nodes): `SarvasyaCourseDTO.java`, `SarvasyaCourseDTO`
+- **Thin community `Community 110`** (2 nodes): `SarvasyaExamQuestionDTO.java`, `SarvasyaExamQuestionDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 110`** (2 nodes): `SarvasyaEnrollmentDTO.java`, `SarvasyaEnrollmentDTO`
+- **Thin community `Community 111`** (2 nodes): `SarvasyaInvoiceDTO.java`, `SarvasyaInvoiceDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 111`** (2 nodes): `SarvasyaExamDTO.java`, `SarvasyaExamDTO`
+- **Thin community `Community 112`** (2 nodes): `SarvasyaLessonDTO.java`, `SarvasyaLessonDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 112`** (2 nodes): `SarvasyaExamQuestionDTO.java`, `SarvasyaExamQuestionDTO`
+- **Thin community `Community 113`** (2 nodes): `SarvasyaModuleDTO.java`, `SarvasyaModuleDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 113`** (2 nodes): `SarvasyaInvoiceDTO.java`, `SarvasyaInvoiceDTO`
+- **Thin community `Community 114`** (2 nodes): `SarvasyaOptionDTO.java`, `SarvasyaOptionDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 114`** (2 nodes): `SarvasyaLessonDTO.java`, `SarvasyaLessonDTO`
+- **Thin community `Community 115`** (2 nodes): `SarvasyaPaymentDTO.java`, `SarvasyaPaymentDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 115`** (2 nodes): `SarvasyaModuleDTO.java`, `SarvasyaModuleDTO`
+- **Thin community `Community 116`** (2 nodes): `SarvasyaQuestionDTO.java`, `SarvasyaQuestionDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 116`** (2 nodes): `SarvasyaOptionDTO.java`, `SarvasyaOptionDTO`
+- **Thin community `Community 117`** (2 nodes): `SarvasyaQuizDTO.java`, `SarvasyaQuizDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 117`** (2 nodes): `SarvasyaPaymentDTO.java`, `SarvasyaPaymentDTO`
+- **Thin community `Community 118`** (2 nodes): `SarvasyaQuizQuestionDTO.java`, `SarvasyaQuizQuestionDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 118`** (2 nodes): `SarvasyaQuestionDTO.java`, `SarvasyaQuestionDTO`
+- **Thin community `Community 119`** (2 nodes): `SarvasyaStudentAnswerDTO.java`, `SarvasyaStudentAnswerDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 119`** (2 nodes): `SarvasyaQuizDTO.java`, `SarvasyaQuizDTO`
+- **Thin community `Community 120`** (2 nodes): `SarvasyaStudyMaterialDTO.java`, `SarvasyaStudyMaterialDTO`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 120`** (2 nodes): `SarvasyaQuizQuestionDTO.java`, `SarvasyaQuizQuestionDTO`
+- **Thin community `Community 121`** (2 nodes): `SignupRequest.java`, `SignupRequest`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 121`** (2 nodes): `SarvasyaStudentAnswerDTO.java`, `SarvasyaStudentAnswerDTO`
+- **Thin community `Community 122`** (2 nodes): `TenantLimitsDto.java`, `TenantLimitsDto`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 122`** (2 nodes): `SarvasyaStudyMaterialDTO.java`, `SarvasyaStudyMaterialDTO`
+- **Thin community `Community 123`** (2 nodes): `UserCreateRequest.java`, `UserCreateRequest`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 123`** (2 nodes): `SignupRequest.java`, `SignupRequest`
+- **Thin community `Community 124`** (2 nodes): `GlobalUser`, `GlobalUser.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 124`** (2 nodes): `TenantLimitsDto.java`, `TenantLimitsDto`
+- **Thin community `Community 125`** (2 nodes): `TenantConfig.java`, `TenantConfig`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 125`** (2 nodes): `UserCreateRequest.java`, `UserCreateRequest`
+- **Thin community `Community 126`** (2 nodes): `TenantLimits.java`, `TenantLimits`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 126`** (2 nodes): `GlobalUser`, `GlobalUser.java`
+- **Thin community `Community 127`** (2 nodes): `ThemeSettings.java`, `ThemeSettings`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 127`** (2 nodes): `TenantConfig.java`, `TenantConfig`
+- **Thin community `Community 128`** (2 nodes): `AssignmentRepository`, `AssignmentRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 128`** (2 nodes): `TenantLimits.java`, `TenantLimits`
+- **Thin community `Community 129`** (2 nodes): `BusRepository`, `BusRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 129`** (2 nodes): `ThemeSettings.java`, `ThemeSettings`
+- **Thin community `Community 130`** (2 nodes): `ClassesRepository`, `ClassesRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 130`** (2 nodes): `AssignmentRepository`, `AssignmentRepository.java`
+- **Thin community `Community 131`** (2 nodes): `DegreeRepository`, `DegreeRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 131`** (2 nodes): `BusRepository`, `BusRepository.java`
+- **Thin community `Community 132`** (2 nodes): `DepartmentRepository`, `DepartmentRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 132`** (2 nodes): `ClassesRepository`, `ClassesRepository.java`
+- **Thin community `Community 133`** (2 nodes): `ExamRepository`, `ExamRepository.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 133`** (2 nodes): `DegreeRepository`, `DegreeRepository.java`
+- **Thin community `Community 134`** (2 nodes): `SarvasyaCourseRepository.java`, `SarvasyaCourseRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 134`** (2 nodes): `DepartmentRepository`, `DepartmentRepository.java`
+- **Thin community `Community 135`** (2 nodes): `SarvasyaEnrollmentRepository.java`, `SarvasyaEnrollmentRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 135`** (2 nodes): `ExamRepository`, `ExamRepository.java`
+- **Thin community `Community 136`** (2 nodes): `SarvasyaExamQuestionRepository.java`, `SarvasyaExamQuestionRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 136`** (2 nodes): `SarvasyaCourseRepository.java`, `SarvasyaCourseRepository`
+- **Thin community `Community 137`** (2 nodes): `SarvasyaExamRepository.java`, `SarvasyaExamRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 137`** (2 nodes): `SarvasyaEnrollmentRepository.java`, `SarvasyaEnrollmentRepository`
+- **Thin community `Community 138`** (2 nodes): `SarvasyaInvoiceRepository.java`, `SarvasyaInvoiceRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 138`** (2 nodes): `SarvasyaExamQuestionRepository.java`, `SarvasyaExamQuestionRepository`
+- **Thin community `Community 139`** (2 nodes): `SarvasyaLessonRepository.java`, `SarvasyaLessonRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 139`** (2 nodes): `SarvasyaExamRepository.java`, `SarvasyaExamRepository`
+- **Thin community `Community 140`** (2 nodes): `SarvasyaModuleRepository.java`, `SarvasyaModuleRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 140`** (2 nodes): `SarvasyaInvoiceRepository.java`, `SarvasyaInvoiceRepository`
+- **Thin community `Community 141`** (2 nodes): `SarvasyaOptionRepository.java`, `SarvasyaOptionRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 141`** (2 nodes): `SarvasyaLessonRepository.java`, `SarvasyaLessonRepository`
+- **Thin community `Community 142`** (2 nodes): `SarvasyaPaymentRepository.java`, `SarvasyaPaymentRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 142`** (2 nodes): `SarvasyaModuleRepository.java`, `SarvasyaModuleRepository`
+- **Thin community `Community 143`** (2 nodes): `SarvasyaQuestionRepository.java`, `SarvasyaQuestionRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 143`** (2 nodes): `SarvasyaOptionRepository.java`, `SarvasyaOptionRepository`
+- **Thin community `Community 144`** (2 nodes): `SarvasyaQuizQuestionRepository.java`, `SarvasyaQuizQuestionRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 144`** (2 nodes): `SarvasyaPaymentRepository.java`, `SarvasyaPaymentRepository`
+- **Thin community `Community 145`** (2 nodes): `SarvasyaQuizRepository.java`, `SarvasyaQuizRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 145`** (2 nodes): `SarvasyaQuestionRepository.java`, `SarvasyaQuestionRepository`
+- **Thin community `Community 146`** (2 nodes): `SarvasyaStudyMaterialRepository.java`, `SarvasyaStudyMaterialRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 146`** (2 nodes): `SarvasyaQuizQuestionRepository.java`, `SarvasyaQuizQuestionRepository`
+- **Thin community `Community 147`** (2 nodes): `TenantConfigRepository.java`, `TenantConfigRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 147`** (2 nodes): `SarvasyaQuizRepository.java`, `SarvasyaQuizRepository`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 148`** (2 nodes): `SarvasyaStudyMaterialRepository.java`, `SarvasyaStudyMaterialRepository`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 149`** (2 nodes): `TenantConfigRepository.java`, `TenantConfigRepository`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 150`** (2 nodes): `TimeTableRepository.java`, `TimeTableRepository`
+- **Thin community `Community 148`** (2 nodes): `TimeTableRepository.java`, `TimeTableRepository`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getValue()` connect `Community 1` to `Community 0`?**
+- **Why does `getValue()` connect `Community 1` to `Community 0`, `Community 3`, `Community 6`?**
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `Bus` connect `Community 0` to `Community 44`?**
+  _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **What connects `AuthRequest`, `AuthResponse`, `UserDto` to the rest of the system?**
   _66 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.03 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
-- **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.11 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
