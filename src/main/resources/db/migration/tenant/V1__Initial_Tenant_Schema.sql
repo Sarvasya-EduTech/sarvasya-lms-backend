@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS time_table_entries (
     start_time VARCHAR(20),
     end_time VARCHAR(20),
     course_name VARCHAR(255),
-    course_id UUID REFERENCES tenant.sarvasya_course(id)
+    course_id UUID REFERENCES course(id) ON DELETE SET NULL
 );
 
 -- 7. Transport (Buses)
