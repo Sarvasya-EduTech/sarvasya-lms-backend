@@ -2,6 +2,7 @@ package com.sarvasya.sarvasya_lms_backend.repository;
 
 import com.sarvasya.sarvasya_lms_backend.model.CalendarItem;
 import com.sarvasya.sarvasya_lms_backend.model.CalendarItemType;
+import com.sarvasya.sarvasya_lms_backend.model.ReferenceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +18,8 @@ public interface CalendarItemRepository extends JpaRepository<CalendarItem, UUID
 
     @Query("SELECT c FROM CalendarItem c WHERE c.classId = :classId OR c.type IN :globalTypes")
     List<CalendarItem> findByClassIdOrGlobalTypes(@Param("classId") UUID classId, @Param("globalTypes") List<CalendarItemType> globalTypes);
+
+    List<CalendarItem> findByReferenceIdAndReferenceType(UUID referenceId, ReferenceType referenceType);
+
+    void deleteByReferenceIdAndReferenceType(UUID referenceId, ReferenceType referenceType);
 }

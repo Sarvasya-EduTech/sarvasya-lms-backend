@@ -28,7 +28,7 @@ public class CalendarItemService {
     }
 
     public List<CalendarItem> findForStudent(UUID classId) {
-        List<CalendarItemType> globalTypes = List.of(CalendarItemType.EVENT, CalendarItemType.HOLIDAY);
+        List<CalendarItemType> globalTypes = List.of(CalendarItemType.EVENT, CalendarItemType.HOLIDAY, CalendarItemType.TIMETABLE);
         if (classId == null) {
             // If student has no class assigned, only show global items
             return repository.findAll().stream()

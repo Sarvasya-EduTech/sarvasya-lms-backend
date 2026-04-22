@@ -5,5 +5,6 @@ public enum CalendarItemType {
     EXAM,
     ASSIGNMENT,
     EVENT,
-    HOLIDAY
+    HOLIDAY,
+    TIMETABLE
 }
