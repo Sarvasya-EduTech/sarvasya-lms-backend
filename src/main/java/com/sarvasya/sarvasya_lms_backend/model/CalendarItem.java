@@ -86,6 +86,10 @@ public class CalendarItem {
             if (referenceType != null && referenceType != ReferenceType.EXAM) {
                 throw new IllegalStateException("CalendarItem of type EXAM must have referenceType EXAM if set");
             }
+        } else if (type == CalendarItemType.TIMETABLE) {
+            if (referenceType != null && referenceType != ReferenceType.TIMETABLE) {
+                throw new IllegalStateException("CalendarItem of type TIMETABLE must have referenceType TIMETABLE if set");
+            }
         }
         // ASSIGNMENT, EVENT, HOLIDAY: no reference validation needed
         // classId is always optional — used for student filtering

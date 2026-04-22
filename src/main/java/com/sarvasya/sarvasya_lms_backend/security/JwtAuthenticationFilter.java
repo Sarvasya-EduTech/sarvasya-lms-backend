@@ -49,13 +49,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (username != null && claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String tokenTenant = (String) claims.get("tenantId");
-
+            String originalTenant = TenantContext.getTenantId();
             if (tokenTenant != null) {
-                // Set tenant from token - this will be used for the entire request
+                // For authentication purposes, we MUST be in the user's tenant context
                 TenantContext.setTenantId(tokenTenant);
             }
 
             UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
+
+            // Restore original tenant context for the rest of the request (e.g. for schema-based data access)
+            if (originalTenant != null && !originalTenant.equals(TenantContext.getTenantId())) {
+                String path = request.getRequestURI();
+                if (originalTenant.equals("tenant") && path.startsWith("/api/sarvasya/")) {
+                    TenantContext.setTenantId("tenant");
+                } else if (!originalTenant.equals("tenant")) {
+                    TenantContext.setTenantId(originalTenant);
+                }
+            }
 
             if (jwtUtil.validateToken(claims, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

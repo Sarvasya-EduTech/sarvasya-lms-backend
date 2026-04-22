@@ -23,6 +23,7 @@ public class Course {
     private String name;
 
     @Column(name = "college_id")
+    @com.fasterxml.jackson.annotation.JsonProperty("code")
     private String collegeId;
 
     @Column(name = "department_id", nullable = false)

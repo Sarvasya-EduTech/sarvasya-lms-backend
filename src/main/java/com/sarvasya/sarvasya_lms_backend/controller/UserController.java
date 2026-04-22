@@ -45,7 +45,7 @@ public class UserController {
             @Valid @RequestBody UserCreateRequest request) {
         try {
             userService.createUser(request, getCurrentUserRole());
-            return ResponseEntity.ok("User created successfully");
+            return ResponseEntity.ok(java.util.Map.of("message", "User created successfully"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -56,14 +56,16 @@ public class UserController {
     public ResponseEntity<?> createUserGlobal(@Valid @RequestBody UserCreateRequest request) {
         String targetTenantId = request.getTenantId();
         if (targetTenantId == null || targetTenantId.isBlank()) {
-            return ResponseEntity.badRequest().body("Error: tenantId is required in the request body for global user creation.");
+            return ResponseEntity.badRequest()
+                    .body("Error: tenantId is required in the request body for global user creation.");
         }
 
         String originalTenant = com.sarvasya.sarvasya_lms_backend.security.TenantContext.getTenantId();
         try {
             com.sarvasya.sarvasya_lms_backend.security.TenantContext.setTenantId(targetTenantId);
             userService.createUser(request, getCurrentUserRole());
-            return ResponseEntity.ok("User created successfully in tenant: " + targetTenantId);
+            return ResponseEntity
+                    .ok(java.util.Map.of("message", "User created successfully in tenant: " + targetTenantId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } finally {
@@ -128,13 +130,14 @@ public class UserController {
             String email = auth.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
-            
+
             Map<String, Object> map = new java.util.LinkedHashMap<>();
             map.put("id", user.getId());
             map.put("name", user.getName());
             map.put("email", user.getEmail());
             map.put("role", user.getRole().getValue());
             map.put("degreeId", user.getDegreeId());
+            map.put("departmentId", user.getDepartmentId());
             return ResponseEntity.ok(map);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -154,6 +157,7 @@ public class UserController {
                 map.put("email", u.getEmail());
                 map.put("role", u.getRole().getValue());
                 map.put("degreeId", u.getDegreeId());
+                map.put("departmentId", u.getDepartmentId());
                 map.put("classId", u.getClassId());
                 return map;
             }).toList();
@@ -173,13 +177,26 @@ public class UserController {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             String degreeIdStr = body.get("degreeId");
+            String departmentIdStr = body.get("departmentId");
             user.setDegreeId(degreeIdStr != null && !degreeIdStr.isBlank() ? UUID.fromString(degreeIdStr) : null);
+            user.setDepartmentId(
+                    departmentIdStr != null && !departmentIdStr.isBlank() ? UUID.fromString(departmentIdStr) : null);
             userRepository.save(user);
-            return ResponseEntity.ok(Map.of("message", "Degree updated", "userId", id, "degreeId", String.valueOf(user.getDegreeId())));
+            return ResponseEntity.ok(
+                    Map.of(
+                            "message",
+                            "Degree/department updated",
+                            "userId",
+                            id,
+                            "degreeId",
+                            String.valueOf(user.getDegreeId()),
+                            "departmentId",
+                            String.valueOf(user.getDepartmentId())));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @GetMapping("/{tenantName}/users/class/{classId}")
     @PreAuthorize("hasAuthority('sarvasya-admin') or hasAuthority('admin') or hasAuthority('professor')")
     public ResponseEntity<?> listUsersByClass(
@@ -213,7 +230,8 @@ public class UserController {
             String classIdStr = body.get("classId");
             user.setClassId(classIdStr != null && !classIdStr.isBlank() ? UUID.fromString(classIdStr) : null);
             userRepository.save(user);
-            return ResponseEntity.ok(Map.of("message", "Class updated", "userId", id, "classId", String.valueOf(user.getClassId())));
+            return ResponseEntity
+                    .ok(Map.of("message", "Class updated", "userId", id, "classId", String.valueOf(user.getClassId())));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

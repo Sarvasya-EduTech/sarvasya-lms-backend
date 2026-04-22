@@ -46,6 +46,16 @@ public class FlywayConfig {
      * Tenant schemas only get tenant-specific tables, not the central schema.
      */
     public void migrateTenantSchema(DataSource dataSource, String tenantIdentifier) {
+        // Never run tenant-scoped migrations on global/shared schemas.
+        if (tenantIdentifier == null) {
+            return;
+        }
+        String normalized = tenantIdentifier.trim().toLowerCase();
+        if (normalized.isEmpty() || normalized.equals("tenant") || normalized.equals("public")) {
+            System.out.println(">>> SKIPPING tenant migration for global schema: [" + tenantIdentifier + "]");
+            return;
+        }
+
         if (migratedSchemas.contains(tenantIdentifier)) {
             return;
         }

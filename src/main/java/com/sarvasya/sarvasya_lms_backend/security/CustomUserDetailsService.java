@@ -1,6 +1,8 @@
 package com.sarvasya.sarvasya_lms_backend.security;
 
+import com.sarvasya.sarvasya_lms_backend.model.BaseUser;
 import com.sarvasya.sarvasya_lms_backend.model.User;
+import com.sarvasya.sarvasya_lms_backend.repository.GlobalUserRepository;
 import com.sarvasya.sarvasya_lms_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,23 +18,26 @@ import java.util.Collections;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final GlobalUserRepository globalUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // First try to find user in the current context schema
-        User user = userRepository.findByEmail(username).orElse(null);
+        BaseUser user;
+        String currentTenant = TenantContext.getTenantId();
 
-        // Fallback: If not found in current schema, check the central 'tenant' schema
-        // This allows TENANT_MANAGERs (who live in 'tenant' schema) to access tenant-specific APIs
-        if (user == null && !"tenant".equals(TenantContext.getTenantId())) {
-            String originalTenant = TenantContext.getTenantId();
-            try {
-                TenantContext.setTenantId("tenant");
-                user = userRepository.findByEmail(username).orElse(null);
-            } finally {
-                TenantContext.setTenantId(originalTenant);
+        if ("tenant".equals(currentTenant)) {
+            // In global context, use globalUserRepository directly to avoid column mismatch errors
+            user = globalUserRepository.findByEmail(username).orElse(null);
+        } else {
+            // First try current tenant schema
+            user = userRepository.findByEmail(username).orElse(null);
+
+            // Fallback: If not found in tenant, check global schema
+            if (user == null) {
+                user = globalUserRepository.findByEmail(username).orElse(null);
             }
         }
+
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + username);
