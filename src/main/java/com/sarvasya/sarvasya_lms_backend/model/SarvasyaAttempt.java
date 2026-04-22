@@ -29,6 +29,11 @@ public class SarvasyaAttempt {
     @Enumerated(EnumType.STRING)
     private AssessmentType type;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    @Builder.Default
+    private AttemptStatus status = AttemptStatus.SUBMITTED;
+
     private BigDecimal score;
 
     @Column(name = "max_score")
@@ -49,10 +54,25 @@ public class SarvasyaAttempt {
     @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
 
+    @Column(name = "started_at")
+    private LocalDateTime startedAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @PrePersist
     public void generateId() {
         if (this.id == null) {
             this.id = UuidCreator.getTimeOrderedEpoch();
         }
+        if (this.startedAt == null) {
+            this.startedAt = LocalDateTime.now();
+        }
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void touchUpdatedAt() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

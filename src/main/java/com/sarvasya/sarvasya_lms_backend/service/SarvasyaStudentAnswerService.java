@@ -21,6 +21,26 @@ public class SarvasyaStudentAnswerService {
         return repository.save(sarvasyaStudentAnswer);
     }
 
+    public List<SarvasyaStudentAnswer> findByAttemptId(UUID attemptId) {
+        return repository.findByAttemptId(attemptId);
+    }
+
+    @Transactional
+    public SarvasyaStudentAnswer upsert(SarvasyaStudentAnswer payload) {
+        if (payload.getAttemptId() == null || payload.getQuestionId() == null) {
+            throw new RuntimeException("attemptId and questionId are required");
+        }
+        return repository.findByAttemptIdAndQuestionId(payload.getAttemptId(), payload.getQuestionId())
+                .map(existing -> {
+                    if (payload.getSelectedOptionIds() != null) existing.setSelectedOptionIds(payload.getSelectedOptionIds());
+                    if (payload.getNatAnswerGiven() != null) existing.setNatAnswerGiven(payload.getNatAnswerGiven());
+                    if (payload.getIsCorrect() != null) existing.setIsCorrect(payload.getIsCorrect());
+                    if (payload.getMarksAwarded() != null) existing.setMarksAwarded(payload.getMarksAwarded());
+                    return repository.save(existing);
+                })
+                .orElseGet(() -> repository.save(payload));
+    }
+
     public List<SarvasyaStudentAnswer> findAll() {
         return repository.findAll();
     }
@@ -32,7 +52,12 @@ public class SarvasyaStudentAnswerService {
     @Transactional
     public SarvasyaStudentAnswer update(UUID id, SarvasyaStudentAnswer updated) {
         return repository.findById(id).map(existing -> {
-            // TODO: Map specific fields from updated to existing here if needed
+            if (updated.getAttemptId() != null) existing.setAttemptId(updated.getAttemptId());
+            if (updated.getQuestionId() != null) existing.setQuestionId(updated.getQuestionId());
+            if (updated.getSelectedOptionIds() != null) existing.setSelectedOptionIds(updated.getSelectedOptionIds());
+            if (updated.getNatAnswerGiven() != null) existing.setNatAnswerGiven(updated.getNatAnswerGiven());
+            if (updated.getIsCorrect() != null) existing.setIsCorrect(updated.getIsCorrect());
+            if (updated.getMarksAwarded() != null) existing.setMarksAwarded(updated.getMarksAwarded());
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("SarvasyaStudentAnswer not found"));
     }

@@ -137,6 +137,7 @@ public class UserController {
             map.put("email", user.getEmail());
             map.put("role", user.getRole().getValue());
             map.put("degreeId", user.getDegreeId());
+            map.put("departmentId", user.getDepartmentId());
             return ResponseEntity.ok(map);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -156,6 +157,7 @@ public class UserController {
                 map.put("email", u.getEmail());
                 map.put("role", u.getRole().getValue());
                 map.put("degreeId", u.getDegreeId());
+                map.put("departmentId", u.getDepartmentId());
                 map.put("classId", u.getClassId());
                 return map;
             }).toList();
@@ -175,10 +177,21 @@ public class UserController {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             String degreeIdStr = body.get("degreeId");
+            String departmentIdStr = body.get("departmentId");
             user.setDegreeId(degreeIdStr != null && !degreeIdStr.isBlank() ? UUID.fromString(degreeIdStr) : null);
+            user.setDepartmentId(
+                    departmentIdStr != null && !departmentIdStr.isBlank() ? UUID.fromString(departmentIdStr) : null);
             userRepository.save(user);
             return ResponseEntity.ok(
-                    Map.of("message", "Degree updated", "userId", id, "degreeId", String.valueOf(user.getDegreeId())));
+                    Map.of(
+                            "message",
+                            "Degree/department updated",
+                            "userId",
+                            id,
+                            "degreeId",
+                            String.valueOf(user.getDegreeId()),
+                            "departmentId",
+                            String.valueOf(user.getDepartmentId())));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -29,6 +29,9 @@ public class Classes {
     @Column(name = "course_id")
     private UUID courseId;
 
+    @Column(name = "department_id")
+    private UUID departmentId;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "class_course",
         joinColumns = @JoinColumn(name = "class_id"),

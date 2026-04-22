@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +22,27 @@ public class SarvasyaCertificateService {
         return repository.save(sarvasyaCertificate);
     }
 
+    public Optional<SarvasyaCertificate> findByStudentAndCourse(UUID studentId, UUID courseId) {
+        return repository.findByStudentIdAndCourseId(studentId, courseId);
+    }
+
+    @Transactional
+    public SarvasyaCertificate createOrUpdate(SarvasyaCertificate payload) {
+        if (payload.getStudentId() == null || payload.getCourseId() == null) {
+            throw new RuntimeException("studentId and courseId are required");
+        }
+        return repository.findByStudentIdAndCourseId(payload.getStudentId(), payload.getCourseId())
+                .map(existing -> {
+                    if (payload.getCertificateUrl() != null) existing.setCertificateUrl(payload.getCertificateUrl());
+                    existing.setIssuedAt(payload.getIssuedAt() != null ? payload.getIssuedAt() : LocalDateTime.now());
+                    return repository.save(existing);
+                })
+                .orElseGet(() -> {
+                    if (payload.getIssuedAt() == null) payload.setIssuedAt(LocalDateTime.now());
+                    return repository.save(payload);
+                });
+    }
+
     public List<SarvasyaCertificate> findAll() {
         return repository.findAll();
     }
@@ -32,7 +54,10 @@ public class SarvasyaCertificateService {
     @Transactional
     public SarvasyaCertificate update(UUID id, SarvasyaCertificate updated) {
         return repository.findById(id).map(existing -> {
-            // TODO: Map specific fields from updated to existing here if needed
+            if (updated.getStudentId() != null) existing.setStudentId(updated.getStudentId());
+            if (updated.getCourseId() != null) existing.setCourseId(updated.getCourseId());
+            if (updated.getCertificateUrl() != null) existing.setCertificateUrl(updated.getCertificateUrl());
+            if (updated.getIssuedAt() != null) existing.setIssuedAt(updated.getIssuedAt());
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("SarvasyaCertificate not found"));
     }

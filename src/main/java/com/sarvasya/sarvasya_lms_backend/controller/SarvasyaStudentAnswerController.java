@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -17,12 +18,30 @@ public class SarvasyaStudentAnswerController {
     private final SarvasyaStudentAnswerService service;
 
     @PostMapping
-    public ResponseEntity<SarvasyaStudentAnswer> create(@RequestBody SarvasyaStudentAnswer payload) {
-        return ResponseEntity.ok(service.create(payload));
+    public ResponseEntity<SarvasyaStudentAnswer> create(@RequestBody Map<String, Object> payload) {
+        final SarvasyaStudentAnswer answer = SarvasyaStudentAnswer.builder()
+                .attemptId(UUID.fromString(String.valueOf(payload.get("attemptId"))))
+                .questionId(UUID.fromString(String.valueOf(payload.get("questionId"))))
+                .selectedOptionIds(payload.get("selectedOptionIds") != null ? payload.get("selectedOptionIds").toString() : null)
+                .build();
+        return ResponseEntity.ok(service.create(answer));
+    }
+
+    @PutMapping("/upsert")
+    public ResponseEntity<SarvasyaStudentAnswer> upsert(@RequestBody Map<String, Object> payload) {
+        final SarvasyaStudentAnswer answer = SarvasyaStudentAnswer.builder()
+                .attemptId(UUID.fromString(String.valueOf(payload.get("attemptId"))))
+                .questionId(UUID.fromString(String.valueOf(payload.get("questionId"))))
+                .selectedOptionIds(payload.get("selectedOptionIds") != null ? payload.get("selectedOptionIds").toString() : null)
+                .build();
+        return ResponseEntity.ok(service.upsert(answer));
     }
 
     @GetMapping
-    public ResponseEntity<List<SarvasyaStudentAnswer>> findAll() {
+    public ResponseEntity<List<SarvasyaStudentAnswer>> findAll(@RequestParam(required = false) String attemptId) {
+        if (attemptId != null && !attemptId.isBlank()) {
+            return ResponseEntity.ok(service.findByAttemptId(UUID.fromString(attemptId)));
+        }
         return ResponseEntity.ok(service.findAll());
     }
 
