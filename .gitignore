@@ -53,9 +53,11 @@ logs/
 *.log
 
 # OS / editor files
-.cursor/
 .DS_Store
 Thumbs.db
+
+# Eclipse/IDE workspace noise
+.metadata/
 
 # Uploaded media (noise)
 uploads/sarvasya/videos/
