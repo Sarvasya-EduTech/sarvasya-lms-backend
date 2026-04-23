@@ -34,3 +34,28 @@ build/
 
 # Environment Variables
 .env
+.env.*
+!.env.example
+
+# Graphify knowledge graph output
+graphify-out/
+
+# Secrets / keys / credentials
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+
+# Logs
+logs/
+*.log
+
+# OS / editor files
+.cursor/
+.DS_Store
+Thumbs.db
+
+# Uploaded media (noise)
+uploads/sarvasya/videos/
