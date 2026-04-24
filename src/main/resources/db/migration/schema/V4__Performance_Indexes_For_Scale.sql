@@ -46,5 +46,15 @@ CREATE INDEX IF NOT EXISTS idx_sarvasya_payment_course
 CREATE INDEX IF NOT EXISTS idx_tenant_users_role
     ON tenant.users (role);
 
-CREATE INDEX IF NOT EXISTS idx_tenant_users_class
-    ON tenant.users (class_id);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'tenant'
+          AND table_name = 'users'
+          AND column_name = 'class_id'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_tenant_users_class ON tenant.users (class_id)';
+    END IF;
+END $$;
