@@ -26,6 +26,7 @@ import com.sarvasya.sarvasya_lms_backend.repository.tenant.TenantConfigRepositor
 import com.sarvasya.sarvasya_lms_backend.repository.user.GlobalUserRepository;
 import com.sarvasya.sarvasya_lms_backend.repository.user.UserRepository;
 import com.sarvasya.sarvasya_lms_backend.service.tenant.TenantLimitsService;
+import com.sarvasya.sarvasya_lms_backend.service.tenant.TenantProvisioningService;
 import com.sarvasya.sarvasya_lms_backend.service.user.UserService;
 
 @Service
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final JavaMailSender mailSender;
     private final TenantLimitsService tenantLimitsService;
     private final TenantConfigRepository tenantConfigRepository;
+    private final TenantProvisioningService tenantProvisioningService;
 
     private void checkRoleLimit(Role role, int additionalCount) {
         long currentCount = userRepository.countByRole(role);
@@ -80,6 +82,7 @@ public class UserServiceImpl implements UserService {
             String tenantId = (req.getTenantId() != null && !req.getTenantId().isBlank())
                     ? req.getTenantId()
                     : extractTenantIdFromEmail(req.getEmail());
+            tenantProvisioningService.provisionTenantSchema(tenantId);
             createDefaultTenantConfig(tenantId);
         }
 

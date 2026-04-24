@@ -1,28 +1,49 @@
 package com.sarvasya.sarvasya_lms_backend.config;
 
+import com.sarvasya.sarvasya_lms_backend.config.db.ShardDataSourceManager;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 import javax.sql.DataSource;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Component
 public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectionProvider<String> {
 
+    private static final Logger log = LoggerFactory.getLogger(SchemaMultiTenantConnectionProvider.class);
+
+    /**
+     * Fallback datasource (single DB mode). Also used for "any connection".
+     */
     private final DataSource dataSource;
+    private final ShardDataSourceManager shardDataSourceManager;
     private final Set<String> initializedSchemas = ConcurrentHashMap.newKeySet();
+    private final Set<String> migrationFailedSchemas = ConcurrentHashMap.newKeySet();
 
-    @Autowired(required = false)
-    private FlywayConfig flywayConfig;
+    @Value("${app.tenancy.auto-migrate-on-request:false}")
+    private boolean autoMigrateOnRequest;
 
-    public SchemaMultiTenantConnectionProvider(DataSource dataSource) {
+    private final FlywayConfig flywayConfig;
+
+    public SchemaMultiTenantConnectionProvider(
+            DataSource dataSource,
+            ObjectProvider<ShardDataSourceManager> shardDataSourceManagerProvider,
+            ObjectProvider<FlywayConfig> flywayConfigProvider) {
         this.dataSource = dataSource;
+        this.shardDataSourceManager = shardDataSourceManagerProvider.getIfAvailable();
+        this.flywayConfig = flywayConfigProvider.getIfAvailable();
         // Don't pre-add 'tenant' here, so it gets initialized on first use
         initializedSchemas.add("public");
+        initializedSchemas.add("tenant");
     }
 
     @Override
@@ -37,7 +58,14 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
     @Override
     public Connection getConnection(String tenantIdentifier) throws SQLException {
-        Connection connection = getAnyConnection();
+        if (tenantIdentifier == null || tenantIdentifier.isBlank()) {
+            tenantIdentifier = "public";
+        }
+        tenantIdentifier = normalizeTenantIdentifier(tenantIdentifier);
+
+        boolean readOnly = TransactionSynchronizationManager.isCurrentTransactionReadOnly();
+        DataSource selected = selectDataSource(tenantIdentifier, readOnly);
+        Connection connection = selected.getConnection();
 
         if (!initializedSchemas.contains(tenantIdentifier)) {
             initializeSchemaAndTables(tenantIdentifier);
@@ -46,7 +74,6 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
         // For PostgreSQL, setting the search_path is the most reliable way to switch
         // schemas
         try (Statement statement = connection.createStatement()) {
-            System.out.println("SQL: SET search_path TO \"" + tenantIdentifier + "\"");
             statement.execute("SET search_path TO \"" + tenantIdentifier + "\"");
         }
 
@@ -58,17 +85,23 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
             return;
         }
 
-        System.out.println(">>> START INITIALIZING schema for tenant: [" + tenantIdentifier + "]");
+        log.info("Initializing schema for tenant [{}]", tenantIdentifier);
 
         if (flywayConfig != null) {
             // Use Flyway for migration
             try {
-                flywayConfig.migrateTenantSchema(dataSource, tenantIdentifier);
+                if (autoMigrateOnRequest) {
+                    flywayConfig.migrateTenantSchema(writerDataSourceForTenant(tenantIdentifier), tenantIdentifier);
+                } else if (!schemaExists(tenantIdentifier)) {
+                    throw new RuntimeException(
+                            "Schema '" + tenantIdentifier + "' is missing and auto migration is disabled. "
+                                    + "Provision tenant before serving traffic.");
+                }
                 initializedSchemas.add(tenantIdentifier);
+                migrationFailedSchemas.remove(tenantIdentifier);
             } catch (Exception e) {
-                System.err.println(
-                        "!!! CRITICAL ERROR migrating tenant schema [" + tenantIdentifier + "]: " + e.getMessage());
-                e.printStackTrace();
+                migrationFailedSchemas.add(tenantIdentifier);
+                log.error("Critical error migrating tenant schema [{}]", tenantIdentifier, e);
                 throw new RuntimeException("Could not initialize tenant schema", e);
             }
         } else {
@@ -77,24 +110,40 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
         }
     }
 
+    private boolean schemaExists(String tenantIdentifier) {
+        try (Connection connection = writerDataSourceForTenant(tenantIdentifier).getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(
+                        "SELECT 1 FROM information_schema.schemata WHERE schema_name = '" + tenantIdentifier + "'")) {
+            return rs.next();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to verify schema existence for tenant: " + tenantIdentifier, e);
+        }
+    }
+
+    private String normalizeTenantIdentifier(String tenantIdentifier) {
+        String normalized = tenantIdentifier.trim().toLowerCase();
+        if (!normalized.matches("[a-z0-9_\\-]+")) {
+            throw new IllegalArgumentException("Invalid tenant identifier");
+        }
+        return normalized;
+    }
+
     private void initializeSchemaManually(String tenantIdentifier) {
-        try (Connection connection = dataSource.getConnection()) {
+        try (Connection connection = writerDataSourceForTenant(tenantIdentifier).getConnection()) {
             connection.setAutoCommit(false);
             try (Statement statement = connection.createStatement()) {
                 // Create the tenant-specific schema
-                System.out.println(">>> Executing: CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
                 statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
                 connection.commit();
                 initializedSchemas.add(tenantIdentifier);
-                System.out.println(">>> SUCCESSFULLY INITIALIZED tenant: " + tenantIdentifier);
+                log.info("Successfully initialized tenant schema [{}]", tenantIdentifier);
             } catch (SQLException e) {
                 connection.rollback();
                 throw e;
             }
         } catch (SQLException e) {
-            System.err.println(
-                    "!!! CRITICAL ERROR initializing schema for [" + tenantIdentifier + "]: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Critical error initializing schema for [{}]", tenantIdentifier, e);
             throw new RuntimeException("Could not initialize tenant schema", e);
         }
     }
@@ -127,6 +176,21 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
     public Set<String> getAllTenants() {
         return initializedSchemas;
+    }
+
+    private DataSource selectDataSource(String tenantIdentifier, boolean readOnly) {
+        if (shardDataSourceManager != null && shardDataSourceManager.isEnabled()) {
+            return readOnly ? shardDataSourceManager.readerForTenant(tenantIdentifier)
+                    : shardDataSourceManager.writerForTenant(tenantIdentifier);
+        }
+        return dataSource;
+    }
+
+    private DataSource writerDataSourceForTenant(String tenantIdentifier) {
+        if (shardDataSourceManager != null && shardDataSourceManager.isEnabled()) {
+            return shardDataSourceManager.writerForTenant(tenantIdentifier);
+        }
+        return dataSource;
     }
 }
 

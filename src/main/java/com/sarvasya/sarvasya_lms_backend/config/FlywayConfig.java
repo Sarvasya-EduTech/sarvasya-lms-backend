@@ -6,9 +6,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.sql.DataSource;
+import com.sarvasya.sarvasya_lms_backend.config.db.ShardDataSourceManager;
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 public class FlywayConfig {
 
     private static final Logger log = LoggerFactory.getLogger(FlywayConfig.class);
+    private static final String GLOBAL_SCHEMA = "tenant";
 
     @Value("${spring.flyway.baseline-on-migrate:true}")
     private boolean baselineOnMigrate;
@@ -26,18 +29,28 @@ public class FlywayConfig {
 
     @Bean
     @ConditionalOnProperty(name = "spring.flyway.enabled", havingValue = "true", matchIfMissing = true)
-    public Flyway flyway(DataSource dataSource) {
-        // Configure Flyway for the default schema (public)
-        // Only run schema migrations, NOT tenant-specific migrations
-        Flyway flyway = Flyway.configure()
-                .dataSource(dataSource)
-                .locations("classpath:db/migration/schema") // Only schema migrations for public schema
-                .baselineOnMigrate(baselineOnMigrate)
-                .schemas("public") // Default schema
-                .load();
+    public Flyway flyway(DataSource dataSource, ObjectProvider<ShardDataSourceManager> shardDataSourceManagerProvider) {
+        // Configure Flyway for the global/shared schema ("tenant").
+        // Tenant schemas are migrated separately via migrateTenantSchema().
+        ensureSchemaExists(dataSource, GLOBAL_SCHEMA);
 
-        // Migrate the default schema
-        flyway.migrate();
+        Flyway flyway = migrateGlobalSchema(dataSource);
+
+        // Sharded mode: each shard is a different physical database, so the global schema must exist on every shard.
+        ShardDataSourceManager shardManager = shardDataSourceManagerProvider.getIfAvailable();
+        if (shardManager != null && shardManager.isEnabled()) {
+            for (String shardId : shardManager.getShardIds()) {
+                DataSource shardWriter = shardManager.writerForShardId(shardId);
+                if (shardWriter == null) {
+                    continue;
+                }
+                try {
+                    migrateGlobalSchema(shardWriter);
+                } catch (Exception e) {
+                    throw new RuntimeException("Flyway global schema migration failed for shard " + shardId, e);
+                }
+            }
+        }
 
         return flyway;
     }
@@ -53,7 +66,7 @@ public class FlywayConfig {
             return;
         }
         String normalized = tenantIdentifier.trim().toLowerCase();
-        if (normalized.isEmpty() || normalized.equals("tenant") || normalized.equals("public")) {
+        if (normalized.isEmpty() || normalized.equals(GLOBAL_SCHEMA) || normalized.equals("public")) {
             log.debug("Skipping tenant migration for global schema [{}]", tenantIdentifier);
             return;
         }
@@ -66,11 +79,7 @@ public class FlywayConfig {
 
         try {
             // Step 1: Ensure the schema exists before Flyway runs
-            log.debug("Creating schema if not exists [{}]", normalized);
-            try (Connection connection = dataSource.getConnection();
-                    Statement statement = connection.createStatement()) {
-                statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + normalized + "\"");
-            }
+            ensureSchemaExists(dataSource, normalized);
 
             // Step 2: Apply tenant-specific migrations to the tenant schema
             log.debug("Running Flyway migrations on schema [{}]", normalized);
@@ -85,8 +94,6 @@ public class FlywayConfig {
                     .validateOnMigrate(true)
                     .load();
 
-            // Repair checksums first (handles cases where migration files were updated)
-            tenantFlyway.repair();
             tenantFlyway.migrate();
 
             migratedSchemas.add(normalized);
@@ -96,6 +103,27 @@ public class FlywayConfig {
             log.error("Critical error migrating tenant schema [{}]", normalized, e);
             throw new RuntimeException("Could not migrate tenant schema", e);
         }
+    }
+
+    private static void ensureSchemaExists(DataSource dataSource, String schema) {
+        if (schema == null || schema.isBlank()) return;
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + schema + "\"");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not ensure schema exists: " + schema, e);
+        }
+    }
+
+    private Flyway migrateGlobalSchema(DataSource dataSource) {
+        ensureSchemaExists(dataSource, GLOBAL_SCHEMA);
+        Flyway flyway = Flyway.configure()
+                .dataSource(dataSource)
+                .locations("classpath:db/migration/schema")
+                .baselineOnMigrate(baselineOnMigrate)
+                .schemas(GLOBAL_SCHEMA)
+                .load();
+        flyway.migrate();
+        return flyway;
     }
 
     public Set<String> getMigratedSchemas() {

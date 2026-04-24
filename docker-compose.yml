@@ -1,17 +1,147 @@
-version: '3.8'
-
 services:
-  db:
-    image: postgres:15
+  # Shard 0 - Writer (Primary)
+  shard0-writer:
+    image: bitnamilegacy/postgresql:15.5.0
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: sarvasyalms
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=sarvasyalms
+    volumes:
+      - shard0_writer_data:/bitnami/postgresql
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
+  # Shard 0 - Reader
+  shard0-reader-0:
+    image: bitnamilegacy/postgresql:15.5.0
+    depends_on:
+      - shard0-writer
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_MASTER_HOST=shard0-writer
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=sarvasyalms
+    volumes:
+      - shard0_reader0_data:/bitnami/postgresql
+    ports:
+      - "5433:5432"
+
+  # Shard 1 - Writer (Primary)
+  shard1-writer:
+    image: bitnamilegacy/postgresql:15.5.0
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=sarvasyalms
+    volumes:
+      - shard1_writer_data:/bitnami/postgresql
+    ports:
+      - "5442:5432"
+
+  # Shard 1 - Reader
+  shard1-reader-0:
+    image: bitnamilegacy/postgresql:15.5.0
+    depends_on:
+      - shard1-writer
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_MASTER_HOST=shard1-writer
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=sarvasyalms
+    volumes:
+      - shard1_reader0_data:/bitnami/postgresql
+    ports:
+      - "5443:5432"
+      
+  # Shard 0 - Writer PgBouncer
+  shard0-writer-pgbouncer:
+    image: edoburu/pgbouncer:latest
+    depends_on:
+      - shard0-writer
+    environment:
+      - DB_NAME=sarvasyalms
+      - DB_HOST=shard0-writer
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - POOL_MODE=transaction
+      - AUTH_TYPE=scram-sha-256
+      - IGNORE_STARTUP_PARAMETERS=extra_float_digits
+      - MAX_CLIENT_CONN=2000
+      - DEFAULT_POOL_SIZE=80
+      - ADMIN_USERS=postgres
+    ports:
+      - "6432:5432"
+
+  # Shard 0 - Reader PgBouncer
+  shard0-reader-0-pgbouncer:
+    image: edoburu/pgbouncer:latest
+    depends_on:
+      - shard0-reader-0
+    environment:
+      - DB_NAME=sarvasyalms
+      - DB_HOST=shard0-reader-0
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - POOL_MODE=transaction
+      - AUTH_TYPE=scram-sha-256
+      - IGNORE_STARTUP_PARAMETERS=extra_float_digits
+      - MAX_CLIENT_CONN=2000
+      - DEFAULT_POOL_SIZE=80
+      - ADMIN_USERS=postgres
+    ports:
+      - "6433:5432"
+
+  # Shard 1 - Writer PgBouncer
+  shard1-writer-pgbouncer:
+    image: edoburu/pgbouncer:latest
+    depends_on:
+      - shard1-writer
+    environment:
+      - DB_NAME=sarvasyalms
+      - DB_HOST=shard1-writer
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - POOL_MODE=transaction
+      - AUTH_TYPE=scram-sha-256
+      - IGNORE_STARTUP_PARAMETERS=extra_float_digits
+      - MAX_CLIENT_CONN=2000
+      - DEFAULT_POOL_SIZE=80
+      - ADMIN_USERS=postgres
+    ports:
+      - "6442:5432"
+
+  # Shard 1 - Reader PgBouncer
+  shard1-reader-0-pgbouncer:
+    image: edoburu/pgbouncer:latest
+    depends_on:
+      - shard1-reader-0
+    environment:
+      - DB_NAME=sarvasyalms
+      - DB_HOST=shard1-reader-0
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - POOL_MODE=transaction
+      - AUTH_TYPE=scram-sha-256
+      - IGNORE_STARTUP_PARAMETERS=extra_float_digits
+      - MAX_CLIENT_CONN=2000
+      - DEFAULT_POOL_SIZE=80
+      - ADMIN_USERS=postgres
+    ports:
+      - "6443:5432"
   app:
     build: .
     ports:
@@ -19,9 +149,25 @@ services:
     env_file:
       - .env
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sarvasyalms
+      # Use container port (5432) inside the compose network; host-mapped ports (6432/6442/...) are for localhost access.
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://shard0-writer-pgbouncer:5432/sarvasyalms?prepareThreshold=0
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
+      - DB_SHARDING_ENABLED=true
+      # Allow auto-provisioning tenant schemas on first request.
+      - TENANCY_AUTO_MIGRATE_ON_REQUEST=true
+      - APP_DB_SHARDING_SHARDS_SHARD0_WRITER_URL=jdbc:postgresql://shard0-writer-pgbouncer:5432/sarvasyalms?prepareThreshold=0
+      - APP_DB_SHARDING_SHARDS_SHARD0_WRITER_USERNAME=postgres
+      - APP_DB_SHARDING_SHARDS_SHARD0_WRITER_PASSWORD=postgres
+      - APP_DB_SHARDING_SHARDS_SHARD0_READERS_0_URL=jdbc:postgresql://shard0-reader-0-pgbouncer:5432/sarvasyalms?prepareThreshold=0
+      - APP_DB_SHARDING_SHARDS_SHARD0_READERS_0_USERNAME=postgres
+      - APP_DB_SHARDING_SHARDS_SHARD0_READERS_0_PASSWORD=postgres
+      - APP_DB_SHARDING_SHARDS_SHARD1_WRITER_URL=jdbc:postgresql://shard1-writer-pgbouncer:5432/sarvasyalms?prepareThreshold=0
+      - APP_DB_SHARDING_SHARDS_SHARD1_WRITER_USERNAME=postgres
+      - APP_DB_SHARDING_SHARDS_SHARD1_WRITER_PASSWORD=postgres
+      - APP_DB_SHARDING_SHARDS_SHARD1_READERS_0_URL=jdbc:postgresql://shard1-reader-0-pgbouncer:5432/sarvasyalms?prepareThreshold=0
+      - APP_DB_SHARDING_SHARDS_SHARD1_READERS_0_USERNAME=postgres
+      - APP_DB_SHARDING_SHARDS_SHARD1_READERS_0_PASSWORD=postgres
       - SPRING_MAIL_HOST=smtp.gmail.com
       - SPRING_MAIL_PORT=587
       - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
@@ -31,9 +177,19 @@ services:
       - SIGNUP_KEY=${SIGNUP_KEY}
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
-      - db
+      - shard0-writer
+      - shard0-reader-0
+      - shard1-writer
+      - shard1-reader-0
+      - shard0-writer-pgbouncer
+      - shard0-reader-0-pgbouncer
+      - shard1-writer-pgbouncer
+      - shard1-reader-0-pgbouncer
     volumes:
       - ./uploads:/app/uploads
 
 volumes:
-  postgres_data:
+  shard0_writer_data:
+  shard0_reader0_data:
+  shard1_writer_data:
+  shard1_reader0_data:

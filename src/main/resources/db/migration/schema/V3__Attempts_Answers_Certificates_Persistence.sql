@@ -38,7 +38,7 @@ BEGIN
         ALTER TABLE tenant.sarvasya_student_answer
             ADD CONSTRAINT uq_student_answer_attempt_question UNIQUE (attempt_id, question_id);
     EXCEPTION
-        WHEN duplicate_object THEN
+        WHEN duplicate_object OR duplicate_table THEN
             NULL;
     END;
 END $$;
@@ -50,7 +50,7 @@ BEGIN
         ALTER TABLE tenant.sarvasya_certificate
             ADD CONSTRAINT uq_certificate_student_course UNIQUE (student_id, course_id);
     EXCEPTION
-        WHEN duplicate_object THEN
+        WHEN duplicate_object OR duplicate_table THEN
             NULL;
     END;
 END $$;

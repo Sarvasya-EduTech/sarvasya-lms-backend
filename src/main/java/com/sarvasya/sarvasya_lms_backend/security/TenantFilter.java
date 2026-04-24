@@ -65,6 +65,15 @@ public class TenantFilter extends OncePerRequestFilter {
         if (path.startsWith(SARVASYA_PREFIX)) {
             if (parts.length >= 4) {
                 String segment = parts[2];
+                // Special-case: /sarvasya/tenants/{tenantId}/... should route using {tenantId}
+                // so global tenant-manager endpoints hit the correct shard for that tenant.
+                if ("tenants".equals(segment)) {
+                    String tenantId = parts[3];
+                    // /sarvasya/tenants/theme is a global endpoint, not a tenant id.
+                    if (tenantId != null && !tenantId.isBlank() && !"theme".equals(tenantId)) {
+                        return tenantId;
+                    }
+                }
                 if (!GLOBAL_SARVASYA_ROOTS.contains(segment)) {
                     return segment;
                 }
