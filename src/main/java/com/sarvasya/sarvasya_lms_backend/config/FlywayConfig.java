@@ -1,22 +1,23 @@
 package com.sarvasya.sarvasya_lms_backend.config;
 
-import org.flywaydb.core.Flyway;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.sql.DataSource;
+import org.flywaydb.core.Flyway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FlywayConfig {
 
-    @Value("${spring.flyway.locations:classpath:db/migration}")
-    private String[] flywayLocations;
+    private static final Logger log = LoggerFactory.getLogger(FlywayConfig.class);
 
     @Value("${spring.flyway.baseline-on-migrate:true}")
     private boolean baselineOnMigrate;
@@ -24,6 +25,7 @@ public class FlywayConfig {
     private final Set<String> migratedSchemas = ConcurrentHashMap.newKeySet();
 
     @Bean
+    @ConditionalOnProperty(name = "spring.flyway.enabled", havingValue = "true", matchIfMissing = true)
     public Flyway flyway(DataSource dataSource) {
         // Configure Flyway for the default schema (public)
         // Only run schema migrations, NOT tenant-specific migrations
@@ -52,33 +54,33 @@ public class FlywayConfig {
         }
         String normalized = tenantIdentifier.trim().toLowerCase();
         if (normalized.isEmpty() || normalized.equals("tenant") || normalized.equals("public")) {
-            System.out.println(">>> SKIPPING tenant migration for global schema: [" + tenantIdentifier + "]");
+            log.debug("Skipping tenant migration for global schema [{}]", tenantIdentifier);
             return;
         }
 
-        if (migratedSchemas.contains(tenantIdentifier)) {
+        if (migratedSchemas.contains(normalized)) {
             return;
         }
 
-        System.out.println(">>> STARTING FLYWAY MIGRATION for tenant schema: [" + tenantIdentifier + "]");
+        log.info("Starting Flyway migration for tenant schema [{}]", normalized);
 
         try {
             // Step 1: Ensure the schema exists before Flyway runs
-            System.out.println(">>> Creating schema if not exists: " + tenantIdentifier);
+            log.debug("Creating schema if not exists [{}]", normalized);
             try (Connection connection = dataSource.getConnection();
                     Statement statement = connection.createStatement()) {
-                statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + tenantIdentifier + "\"");
+                statement.execute("CREATE SCHEMA IF NOT EXISTS \"" + normalized + "\"");
             }
 
             // Step 2: Apply tenant-specific migrations to the tenant schema
-            System.out.println(">>> Running Flyway migrations on schema: " + tenantIdentifier);
+            log.debug("Running Flyway migrations on schema [{}]", normalized);
             Flyway tenantFlyway = Flyway.configure()
                     .dataSource(dataSource)
                     .locations("classpath:db/migration/tenant")
                     .baselineOnMigrate(true)
-                    .schemas(tenantIdentifier)
+                    .schemas(normalized)
                     .table("flyway_schema_history") // Separate history table per schema
-                    .placeholders(Map.of("schema", tenantIdentifier))
+                    .placeholders(Map.of("schema", normalized))
                     .outOfOrder(false)
                     .validateOnMigrate(true)
                     .load();
@@ -87,13 +89,11 @@ public class FlywayConfig {
             tenantFlyway.repair();
             tenantFlyway.migrate();
 
-            migratedSchemas.add(tenantIdentifier);
-            System.out.println(">>> SUCCESSFULLY MIGRATED tenant schema: " + tenantIdentifier);
+            migratedSchemas.add(normalized);
+            log.info("Successfully migrated tenant schema [{}]", normalized);
 
         } catch (Exception e) {
-            System.err.println(
-                    "!!! CRITICAL ERROR migrating tenant schema [" + tenantIdentifier + "]: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Critical error migrating tenant schema [{}]", normalized, e);
             throw new RuntimeException("Could not migrate tenant schema", e);
         }
     }
@@ -102,3 +102,11 @@ public class FlywayConfig {
         return migratedSchemas;
     }
 }
+
+
+
+
+
+
+
+

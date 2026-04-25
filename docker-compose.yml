@@ -16,6 +16,8 @@ services:
     build: .
     ports:
       - "8081:8080"
+    env_file:
+      - .env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sarvasyalms
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -27,6 +29,7 @@ services:
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=true
       - SIGNUP_KEY=${SIGNUP_KEY}
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - db
     volumes:

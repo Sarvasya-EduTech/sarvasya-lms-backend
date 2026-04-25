@@ -1,0 +1,109 @@
+package com.sarvasya.sarvasya_lms_backend.model.calendar;
+
+import com.sarvasya.sarvasya_lms_backend.model.assignment.Assignment;
+import com.sarvasya.sarvasya_lms_backend.model.course.Course;
+import com.sarvasya.sarvasya_lms_backend.model.exam.Exam;
+import com.sarvasya.sarvasya_lms_backend.model.timetable.TimeTable;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
+import com.sarvasya.sarvasya_lms_backend.model.common.ReferenceType;
+
+@Entity
+@Table(name = "calendar_item", indexes = {
+    @Index(name = "idx_calendar_item_start_datetime", columnList = "start_date_time"),
+    @Index(name = "idx_calendar_item_type", columnList = "type")
+})
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CalendarItem {
+
+    @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    private UUID id;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CalendarItemType type;
+
+    @Column(name = "start_date_time", nullable = false)
+    private LocalDateTime startDateTime;
+
+    @Column(name = "end_date_time", nullable = false)
+    private LocalDateTime endDateTime;
+
+    @Column(name = "all_day", nullable = false)
+    private Boolean allDay = false;
+
+    @Column(name = "reference_id")
+    private UUID referenceId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reference_type")
+    private ReferenceType referenceType;
+
+    @Column(name = "color_code")
+    private String colorCode;
+
+    @Column(name = "class_id")
+    private UUID classId;
+
+    @Column(name = "created_by")
+    private UUID createdBy;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        validateReferences();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+        validateReferences();
+    }
+
+    private void validateReferences() {
+        if (type == CalendarItemType.CLASS) {
+            if (referenceType != null && referenceType != ReferenceType.CLASS && referenceType != ReferenceType.COURSE) {
+                throw new IllegalStateException("CalendarItem of type CLASS must have referenceType CLASS, COURSE or null");
+            }
+        } else if (type == CalendarItemType.EXAM) {
+            if (referenceType != null && referenceType != ReferenceType.EXAM) {
+                throw new IllegalStateException("CalendarItem of type EXAM must have referenceType EXAM if set");
+            }
+        } else if (type == CalendarItemType.TIMETABLE) {
+            if (referenceType != null && referenceType != ReferenceType.TIMETABLE) {
+                throw new IllegalStateException("CalendarItem of type TIMETABLE must have referenceType TIMETABLE if set");
+            }
+        }
+        // ASSIGNMENT, EVENT, HOLIDAY: no reference validation needed
+        // classId is always optional — used for student filtering
+    }
+}
+
+
+
+
+
+
+
+

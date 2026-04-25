@@ -1,5 +1,6 @@
 package com.sarvasya.sarvasya_lms_backend.config;
 
+import java.util.Map;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
@@ -7,8 +8,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 public class HibernateConfig implements BeanPostProcessor {
@@ -33,3 +32,11 @@ public class HibernateConfig implements BeanPostProcessor {
         return bean;
     }
 }
+
+
+
+
+
+
+
+

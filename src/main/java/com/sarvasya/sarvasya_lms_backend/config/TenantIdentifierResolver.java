@@ -1,8 +1,8 @@
 package com.sarvasya.sarvasya_lms_backend.config;
 
-import com.sarvasya.sarvasya_lms_backend.security.TenantContext;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.stereotype.Component;
+import com.sarvasya.sarvasya_lms_backend.security.TenantContext;
 
 @Component
 public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver<String> {
@@ -21,3 +21,11 @@ public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver
         return false; // prevent session re-validation when tenant changes
     }
 }
+
+
+
+
+
+
+
+
